@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Elite Dangerous - Navroute</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+      body {
+        background-color: black;
+        color: white;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        height: 100vh;
+        font-size: max(10px, 0.8vw);
+        font-family: Arial, Helvetica, sans-serif;
+      }
+  
+      ul {
+        display: flex;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+  
+      li {
+        display: flex;
+        align-items: center;
+        position: relative;
+      }
+  
+      li::after {
+        content: "";
+        width: .6vw;
+        height: .6vw;
+        background-color: #02a5ec;
+        border-radius: 50%;
+      }
+
+      li:first-child::after,
+      li:last-child::after {
+        width: 1vw;
+        height: 1vw;
+      }
+
+      li.current::after {
+        background-color: white;
+      }
+  
+      li + li::before {
+        content: "";
+        display: block;
+        width: 5vw;
+        height: 2px;
+        margin: 0 .5vw;
+        background-color: #02a5ec;
+      }
+      
+      li.current ~ li::after {
+        background-color: #444;
+      }
+  
+      li.current ~ li::before {
+        background-color: #444;
+      }
+  
+      li > span {
+        position: absolute;
+        right: .5vw;
+        top: 1vw;
+        color: #02a5ec;
+        transform: translateX(50%);
+        white-space: nowrap;
+      }
+
+      li.current > span {
+        color: white;
+      }
+      
+      li.current ~ li > span {
+        color: #888;
+      }
+  
+      li:nth-child(odd) > span {
+        top: -1.4vw;
+      }
+    </style>
+  </head>
+  
+  <body>
+    <script>
+      function createElement(tagName, parentEl) {
+        const el = document.createElement(tagName);
+        parentEl.appendChild(el);
+        return el;
+      }
+
+      let routeEl = createElement('ul', document.body);
+      let systemList = {};
+      let lastSystem;
+
+      class System {
+        el;
+        labelEl;
+
+        constructor(parentEl, name) {
+          this.el = createElement('li', parentEl);
+          this.labelEl = createElement('span', this.el);
+          this.labelEl.innerHTML = name;
+        }
+      }
+
+      /**
+       * Socket.io client
+       */
+      var socket = io();
+    
+      socket.on('navroute', navroute => {
+        console.log('navroute: ', navroute);
+
+        routeEl.innerHTML = '';
+        systemList = {};
+
+        navroute.Route.forEach(step => {
+          const system = new System(routeEl, step.StarSystem);
+          systemList[step.StarSystem] = system;
+          if (lastSystem == step.StarSystem) {
+            system.el.classList.add('current');
+          }
+        });
+      });
+    
+      socket.on('currentSystem', currentSystem => {
+        console.log('system: ', currentSystem);
+
+        if (lastSystem && systemList[lastSystem]) {
+          systemList[lastSystem].el.classList.remove('current')
+        }
+        
+        lastSystem = currentSystem;
+        systemList[currentSystem].el.classList.add('current');
+      });
+    </script>
+  </body>
+</html>
