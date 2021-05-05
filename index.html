@@ -13,12 +13,15 @@
         justify-content: center;
         overflow: hidden;
         height: 100vh;
-        font-size: max(10px, 0.8vw);
+        font-size: 0.8vw;
         font-family: Arial, Helvetica, sans-serif;
       }
   
       ul {
-        display: flex;
+        --color-primary: white;
+        --color-secondary: #02a5ec;
+        --color-off: #666;
+        display: flex;;
         margin: 0;
         padding: 0;
         list-style: none;
@@ -31,10 +34,10 @@
       }
 
       li,
-      li.current::before  { --color: #02a5ec; }
-      li.current          { --color: white; }
-      li.current ~ li     { --color: #666; }
-      li.jumping + li     { --color: white; }
+      li.current::before  { --color: var(--color-secondary); }
+      li.current          { --color: var(--color-primary); }
+      li.current ~ li     { --color: var(--color-off); }
+      li.jumping + li     { --color: var(--color-primary); }
   
       li::after {
         content: "";
@@ -42,15 +45,9 @@
         width: .6vw;
         height: .6vw;
         border-radius: 50%;
-        border: max(1px, .2vw) solid var(--color);
+        border: .2vw solid var(--color);
         transition-property: border-color, background-color;
         transition-duration: .5s;
-      }
-
-      li:first-child::after,
-      li:last-child::after {
-        width: 1vw;
-        height: 1vw;
       }
 
       li.scoopable::after {
@@ -60,20 +57,26 @@
       li + li::before {
         content: "";
         display: block;
-        width: 5vw;
-        height: 2px;
-        margin: 0 .5vw;
+        width: 3vw;
+        height: 1px;
         background-color: var(--color);
         transition: background-color .5s;
       }
   
       li > span {
         position: absolute;
-        right: .5vw;
+        right: .3vw;
         transform: translate(50%, 1.1vw);
-        white-space: nowrap;
-        color: var(--color);
+        width: 14ch;
+        text-align: center;
+        line-height: .9;
+        color: var(--color-off);
         transition: color .5s;
+      }
+
+      li.current > span,
+      li.jumping + li > span {
+        color: var(--color-primary);
       }
   
       li:nth-child(odd) > span {
