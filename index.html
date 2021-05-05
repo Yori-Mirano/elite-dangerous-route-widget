@@ -34,8 +34,9 @@
         content: "";
         width: .6vw;
         height: .6vw;
-        background-color: #02a5ec;
         border-radius: 50%;
+        background-color: #02a5ec;
+        transition: background-color .5s;
       }
 
       li:first-child::after,
@@ -55,6 +56,7 @@
         height: 2px;
         margin: 0 .5vw;
         background-color: #02a5ec;
+        transition: background-color .5s;
       }
       
       li.current ~ li::after {
@@ -68,10 +70,10 @@
       li > span {
         position: absolute;
         right: .5vw;
-        top: 1vw;
-        color: #02a5ec;
-        transform: translateX(50%);
+        transform: translate(50%, 1.1vw);
         white-space: nowrap;
+        color: #02a5ec;
+        transition: color .5s;
       }
 
       li.current > span {
@@ -83,7 +85,29 @@
       }
   
       li:nth-child(odd) > span {
-        top: -1.4vw;
+        transform: translate(50%, -1.1vw);
+      }
+
+      /**
+      * Jumping
+      */
+      @keyframes pulse {
+        from { opacity: 1; }
+        to   { opacity: 0.2; }
+      }
+            
+      li.jumping + li::after {
+        animation: pulse infinite alternate .75s;
+        background-color: white;
+      }
+
+      li.jumping + li::before {
+        animation: pulse infinite alternate .75s;
+        background-color: white;
+      }
+
+      li.jumping + li > span {
+        color: white;
       }
     </style>
   </head>
@@ -117,7 +141,7 @@
       var socket = io();
     
       socket.on('navroute', navroute => {
-        console.log('navroute: ', navroute);
+        console.log('navroute:', navroute);
 
         routeEl.innerHTML = '';
         systemList = {};
@@ -131,15 +155,24 @@
         });
       });
     
-      socket.on('currentSystem', currentSystem => {
-        console.log('system: ', currentSystem);
+      socket.on('system', system => {
+        console.log('system:', system);
 
         if (lastSystem && systemList[lastSystem]) {
           systemList[lastSystem].el.classList.remove('current')
+          systemList[lastSystem].el.classList.remove('jumping');
         }
-        
-        lastSystem = currentSystem;
-        systemList[currentSystem].el.classList.add('current');
+
+        if (system && systemList[system]) {
+          systemList[system].el.classList.add('current');
+        }
+
+        lastSystem = system;
+      });
+      
+      socket.on('jumping', system => {
+        console.log('jumping:', system);
+        systemList[system].el.classList.add('jumping');
       });
     </script>
   </body>

@@ -33,6 +33,7 @@ updateNavRouteFromFile();
 // Current System
 let currentSystem;
 let lastSystem;
+let isJumping = false;
 const glob = require('glob')
 const lineReader = require('line-reader');
 const lastLogFilePath = getLastLogFilePath();
@@ -47,17 +48,29 @@ function getLastLogFilePath() {
 function readLastLogFile() {
   lineReader.eachLine(lastLogFilePath, function(line, last) {
     let log = JSON.parse(line);
+
+    if (log.event === 'StartJump') {
+      isJumping = true;
+    }
     
     if (log.event === 'FSDJump' || log.event === 'Location') {
+      isJumping = false;
       currentSystem = log.StarSystem;
     }
   
-    if (last && currentSystem && lastSystem !== currentSystem) {
-      lastSystem = currentSystem
-      console.log('> system: ', currentSystem);
+    if (last && currentSystem) {
+      if (io && isJumping) {
+        console.log('> jumping: ', currentSystem);
+        io.emit('jumping', currentSystem);
+      }
 
-      if (io) {
-        io.emit('currentSystem', currentSystem);
+      if (lastSystem !== currentSystem) {
+        console.log('> system: ', currentSystem);
+        lastSystem = currentSystem
+  
+        if (io) {
+          io.emit('system', currentSystem);
+        }
       }
     }
   });
@@ -87,13 +100,9 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
   console.log('> a user connected');
 
-  if (navRoute) {
-    socket.emit('navroute', navRoute);
-  }
-
-  if (currentSystem) {
-    socket.emit('currentSystem', currentSystem);
-  }
+  if (navRoute)       { socket.emit('navroute', navRoute); }
+  if (currentSystem)  { socket.emit('system', currentSystem); }
+  if (isJumping)      { socket.emit('jumping', currentSystem); }
 
   socket.on('disconnect', () => {
     console.log('> user disconnected');
