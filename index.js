@@ -6,90 +6,136 @@ const homedir = require('os').homedir();
 const config = require('./config.json');
 const baseDir = config.dir.replace('%userprofile%', homedir);
 const files = {
-  navRoute: baseDir + '/NavRoute.json'
+  route: baseDir + '/NavRoute.json'
 }
 
 
-// NavRoute
-let navRoute;
+// Route
+let route;
 
-fs.watchFile(files.navRoute, (curr, prev) => {
-  updateNavRouteFromFile();
-
-  if (io) {
-    io.emit('navroute', navRoute);
-  }
-});
-
-function updateNavRouteFromFile() {
-  const rawdata = fs.readFileSync(files.navRoute);
-  navRoute = JSON.parse(rawdata);
-  console.log('> navroute:', navRoute.Route.length, 'steps');
+function updateRouteFromFile() {
+  const rawdata = fs.readFileSync(files.route);
+  route = JSON.parse(rawdata).Route;
+  console.log(new Date(), 'route:', route.length, 'steps');
 }
 
-updateNavRouteFromFile();
+function watchRoute() {
+  updateRouteFromFile();
+
+  let watchTimeout; 
+
+  fs.watch(files.route, () => {
+    if (watchTimeout) { clearTimeout(watchTimeout); } // prevent duplicated watch notifications
+    
+    watchTimeout = setTimeout(() => {
+      console.log(new Date(), 'watchRoute: change detected');
+      updateRouteFromFile();
+      if (io) { io.emit('route', route); }
+    }, 100);
+  });
+}
+
+watchRoute();
 
 
 // Current System
+const glob = require('glob')
+const lineReader = require('line-reader');
 let currentSystem;
 let lastSystem;
 let isJumping = false;
-const glob = require('glob')
-const lineReader = require('line-reader');
-const lastLogFilePath = getLastLogFilePath();
-console.log('> log file: ' + lastLogFilePath);
+let lastLogFilePath;
+let prevLogFilePath;
+let dirWatcher;
+let fileWatcher;
 
-function getLastLogFilePath() {
-  return glob.sync(baseDir + '/*.log')
-    .map(name => ({name, ctime: fs.statSync(name).ctime}))
-    .sort((a, b) => b.ctime - a.ctime)[0].name
+function watchLog() {
+  let watchTimeout;
+
+  dirWatcher = fs.watch(baseDir, () => {
+    if (watchTimeout) { clearTimeout(watchTimeout); } // prevent duplicated watch notifications
+    
+    watchTimeout = setTimeout(() => {
+      console.log(new Date(), 'watchLog: change detected');
+      watchLogFromMostRecentFile();
+    }, 100);
+  });
+
+  watchLogFromMostRecentFile(); 
 }
 
-function readLastLogFile() {
-  lineReader.eachLine(lastLogFilePath, function(line, last) {
-    let log = JSON.parse(line);
-
-    if (log.event === 'StartJump') {
-      isJumping = true;
-    }
+function watchLogFromMostRecentFile() {
+  lastLogFilePath = glob.sync(baseDir + '/*.log')
+    .map(name => ({name, ctime: fs.statSync(name).ctime}))
+    .sort((a, b) => b.ctime - a.ctime)[0].name;
+  
+  if (lastLogFilePath !== prevLogFilePath) {    
+    console.log(new Date(), 'log file: ' + lastLogFilePath);
+    prevLogFilePath = lastLogFilePath;
     
-    if (log.event === 'FSDJump' || log.event === 'Location') {
-      isJumping = false;
-      currentSystem = log.StarSystem;
+    if (dirWatcher) { dirWatcher.close(); }
+    
+    let watchTimeout;
+    fileWatcher = fs.watch(lastLogFilePath, () => {
+      if (watchTimeout) { clearTimeout(watchTimeout); } // prevent duplicated watch notifications
+
+      watchTimeout = setTimeout(() => {
+        console.log(new Date(), 'watchLogFromMostRecentFile: change detected');
+        dispatchLogEvents();
+      }, 100);
+    });
+
+    dispatchLogEvents();
+  }
+}
+
+function dispatchLogEvents() {
+  lineReader.eachLine(lastLogFilePath, function(line, last) {
+    const log = JSON.parse(line);
+
+    switch (log.event) {
+      case 'StartJump':
+        isJumping = true;
+        break;
+
+      case 'Location':
+      case 'FSDJump':
+        isJumping = false;
+        currentSystem = log.StarSystem;
+        break;
+
+      case 'Shutdown':
+        if (fileWatcher && fileWatcher.close) { fileWatcher.close(); }
+        watchLog();
+        break;
+
+      default:
+        // Do nothing
     }
   
     if (last && currentSystem) {
-      if (io && isJumping) {
-        console.log('> jumping: ', currentSystem);
-        io.emit('jumping', currentSystem);
+      if (isJumping) {
+        console.log(new Date(), 'jumping: ', currentSystem);
+        if (io) { io.emit('jumping', currentSystem); }
       }
 
       if (lastSystem !== currentSystem) {
-        console.log('> system: ', currentSystem);
-        lastSystem = currentSystem
-  
-        if (io) {
-          io.emit('system', currentSystem);
-        }
+        console.log(new Date(), 'system: ', currentSystem);
+        lastSystem = currentSystem;
+        if (io) { io.emit('system', currentSystem); }
       }
     }
   });
 }
 
-fs.watchFile(lastLogFilePath, (curr, prev) => {
-  readLastLogFile();
-});
-
-readLastLogFile();
+watchLog();
 
 
 /**
  * Server
  */
-const express = require('express');
-const app = express();
-const http = require('http');
-const server = http.createServer(app);
+const app = require('express')();
+const server = require('http').createServer(app);
 const { Server } = require('socket.io');
 const io = new Server(server);
 
@@ -98,17 +144,17 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  console.log('> a user connected');
+  console.log(new Date(), 'a user connected');
 
-  if (navRoute)       { socket.emit('navroute', navRoute); }
+  if (route)          { socket.emit('route', route); }
   if (currentSystem)  { socket.emit('system', currentSystem); }
   if (isJumping)      { socket.emit('jumping', currentSystem); }
 
   socket.on('disconnect', () => {
-    console.log('> user disconnected');
+    console.log(new Date(), 'user disconnected');
   });
 });
 
 server.listen(3000, () => {
-  console.log('> listening on *:3000');
+  console.log(new Date(), 'listening on *:3000');
 });

@@ -4,6 +4,12 @@
     <title>Elite Dangerous - Navroute</title>
     <script src="/socket.io/socket.io.js"></script>
     <style>
+      :root {
+        --color-primary   : white;
+        --color-secondary : #02a5ec;
+        --color-off       : #666;
+      }
+
       body {
         background-color: black;
         color: white;
@@ -18,13 +24,10 @@
       }
   
       ul {
-        --color-primary: white;
-        --color-secondary: #02a5ec;
-        --color-off: #666;
-        display: flex;;
+        display: flex;
         margin: 0;
         padding: 0;
-        list-style: none;
+        list-style-type: none;
       }
   
       li {
@@ -33,11 +36,12 @@
         position: relative;
       }
 
-      li,
-      li.current::before  { --color: var(--color-secondary); }
-      li.current          { --color: var(--color-primary); }
-      li.current ~ li     { --color: var(--color-off); }
-      li.jumping + li     { --color: var(--color-primary); }
+      li                      { --color: var(--color-secondary); }
+      li.current              { --color: var(--color-primary); }
+      li.current::before      { --color: var(--color-secondary); }
+      li.jumping::after       { --color: var(--color-secondary); }
+      li.jumping + li::before { --color: var(--color-primary); }
+      li.current ~ li         { --color: var(--color-off); }
   
       li::after {
         content: "";
@@ -58,7 +62,8 @@
         content: "";
         display: block;
         width: 3vw;
-        height: 1px;
+        height: 2px;
+        margin: 0 .2vw;
         background-color: var(--color);
         transition: background-color .5s;
       }
@@ -74,8 +79,11 @@
         transition: color .5s;
       }
 
-      li.current > span,
-      li.jumping + li > span {
+      li.current.jumping > span {
+        color: var(--color-off);
+      }
+
+      li.current > span {
         color: var(--color-primary);
       }
   
@@ -83,16 +91,9 @@
         transform: translate(50%, -1.1vw);
       }
 
-      /**
-      * Jumping
-      */
       @keyframes pulse {
         from { opacity: 1; }
         to   { opacity: 0.2; }
-      }
-            
-      li.jumping + li::after {
-        animation: pulse infinite alternate .75s;
       }
 
       li.jumping + li::before {
@@ -103,16 +104,18 @@
   
   <body>
     <script>
+      /**
+       * Helpers
+       */
       function createElement(tagName, parentEl) {
         const el = document.createElement(tagName);
         parentEl.appendChild(el);
         return el;
       }
 
-      let routeEl = createElement('ul', document.body);
-      let systemList = {};
-      let lastSystem;
-
+      /**
+       * System
+       */
       class System {
         el;
         labelEl;
@@ -137,17 +140,24 @@
       }
 
       /**
+       * Init
+       */
+      let routeEl = createElement('ul', document.body);
+      let systemList = {};
+      let lastSystem;
+
+      /**
        * Socket.io client
        */
       var socket = io();
     
-      socket.on('navroute', navroute => {
-        console.log('navroute:', navroute);
+      socket.on('route', route => {
+        console.log('route:', route);
 
         routeEl.innerHTML = '';
         systemList = {};
 
-        navroute.Route.forEach(step => {
+        route.forEach(step => {
           const system = new System(routeEl, step.StarSystem, step.StarClass);
           systemList[step.StarSystem] = system;
           if (lastSystem == step.StarSystem) {
