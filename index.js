@@ -4,7 +4,7 @@
 const fs = require('fs');
 const homedir = require('os').homedir();
 const config = require('./config.json');
-const baseDir = config.dir.replace('%userprofile%', homedir);
+const baseDir = config.edLogDir.replace('%userprofile%', homedir);
 const files = {
   route: baseDir + '/NavRoute.json'
 }
@@ -96,6 +96,7 @@ function dispatchLogEvents() {
     switch (log.event) {
       case 'StartJump':
         isJumping = true;
+        currentSystem = log.StarSystem;
         break;
 
       case 'Location':

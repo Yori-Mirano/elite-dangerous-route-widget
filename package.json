@@ -1,9 +1,11 @@
 {
-  "name": "elite-dangerous-stream-widget",
-  "version": "1.0.0",
+  "name": "elite-dangerous-route-tracking-widget",
+  "version": "1.0.0-alpha.1",
   "description": "",
   "main": "index.js",
+  "engines" : { "node" : ">=0.12" },
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Yori Mirano",
