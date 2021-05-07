@@ -37,11 +37,14 @@
       }
 
       li                      { --color: var(--color-secondary); }
+
       li.current              { --color: var(--color-primary); }
       li.current::before      { --color: var(--color-secondary); }
-      li.jumping::after       { --color: var(--color-secondary); }
-      li.jumping + li::before { --color: var(--color-primary); }
       li.current ~ li         { --color: var(--color-off); }
+      
+      li.jumping              { --color: var(--color-off); }
+      li.jumping::before      { --color: var(--color-primary); }
+      li.jumping ~ li         { --color: var(--color-off); }
   
       li::after {
         content: "";
@@ -79,10 +82,6 @@
         transition: color .5s;
       }
 
-      li.current.jumping > span {
-        color: var(--color-off);
-      }
-
       li.current > span {
         color: var(--color-primary);
       }
@@ -96,7 +95,7 @@
         to   { opacity: 0.2; }
       }
 
-      li.jumping + li::before {
+      li.jumping::before {
         animation: pulse infinite alternate .75s;
       }
     </style>
@@ -171,10 +170,10 @@
 
         if (lastSystem && systemList[lastSystem]) {
           systemList[lastSystem].el.classList.remove('current')
-          systemList[lastSystem].el.classList.remove('jumping');
         }
 
         if (system && systemList[system]) {
+          systemList[system].el.classList.remove('jumping');
           systemList[system].el.classList.add('current');
         }
 
@@ -183,7 +182,14 @@
       
       socket.on('jumping', system => {
         console.log('jumping:', system);
-        systemList[system].el.classList.add('jumping');
+        
+        if (lastSystem && systemList[lastSystem]) {
+          systemList[lastSystem].el.classList.remove('current')
+        }
+
+        if (system && systemList[system]) {
+          systemList[system].el.classList.add('jumping');
+        }
       });
     </script>
   </body>

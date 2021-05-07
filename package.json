@@ -3,7 +3,9 @@
   "version": "1.0.0-alpha.1",
   "description": "",
   "main": "index.js",
-  "engines" : { "node" : ">=0.12" },
+  "engines": {
+    "node": ">=0.12"
+  },
   "scripts": {
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,6 +13,7 @@
   "author": "Yori Mirano",
   "license": "ISC",
   "dependencies": {
+    "chokidar": "^3.5.1",
     "express": "^4.17.1",
     "glob": "^7.1.6",
     "line-reader": "^0.4.0",

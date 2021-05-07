@@ -75,14 +75,9 @@ function watchLogFromMostRecentFile() {
     
     if (dirWatcher) { dirWatcher.close(); }
     
-    let watchTimeout;
-    fileWatcher = fs.watch(lastLogFilePath, () => {
-      if (watchTimeout) { clearTimeout(watchTimeout); } // prevent duplicated watch notifications
-
-      watchTimeout = setTimeout(() => {
-        console.log(new Date(), 'watchLogFromMostRecentFile: change detected');
-        dispatchLogEvents();
-      }, 100);
+    fs.watchFile(lastLogFilePath, { interval: 1000 }, () => {
+      console.log(new Date(), 'watchLogFromMostRecentFile: change detected');
+      dispatchLogEvents();
     });
 
     dispatchLogEvents();
@@ -96,7 +91,7 @@ function dispatchLogEvents() {
     switch (log.event) {
       case 'StartJump':
         isJumping = true;
-        currentSystem = log.StarSystem;
+        nextSystem = log.StarSystem;
         break;
 
       case 'Location':
@@ -106,7 +101,7 @@ function dispatchLogEvents() {
         break;
 
       case 'Shutdown':
-        if (fileWatcher && fileWatcher.close) { fileWatcher.close(); }
+        fs.unwatchFile(lastLogFilePath);
         watchLog();
         break;
 
@@ -114,13 +109,14 @@ function dispatchLogEvents() {
         // Do nothing
     }
   
-    if (last && currentSystem) {
+    if (last) {
       if (isJumping) {
-        console.log(new Date(), 'jumping: ', currentSystem);
-        if (io) { io.emit('jumping', currentSystem); }
-      }
-
-      if (lastSystem !== currentSystem) {
+        if (nextSystem !== currentSystem) {
+          console.log(new Date(), 'jumping: ', nextSystem);
+          if (io) { io.emit('jumping', nextSystem); }
+        }
+        
+      } else if (currentSystem !== lastSystem) {
         console.log(new Date(), 'system: ', currentSystem);
         lastSystem = currentSystem;
         if (io) { io.emit('system', currentSystem); }
