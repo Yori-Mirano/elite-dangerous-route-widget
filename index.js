@@ -90,8 +90,10 @@ function dispatchLogEvents() {
 
     switch (log.event) {
       case 'StartJump':
-        isJumping = true;
-        nextSystem = log.StarSystem;
+        if (log.JumpType === "Hyperspace") {
+          isJumping = true;
+          nextSystem = log.StarSystem;
+        }
         break;
 
       case 'Location':
@@ -115,7 +117,7 @@ function dispatchLogEvents() {
           console.log(new Date(), 'jumping: ', nextSystem);
           if (io) { io.emit('jumping', nextSystem); }
         }
-        
+
       } else if (currentSystem !== lastSystem) {
         console.log(new Date(), 'system: ', currentSystem);
         lastSystem = currentSystem;

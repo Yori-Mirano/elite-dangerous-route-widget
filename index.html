@@ -19,8 +19,24 @@
         justify-content: center;
         overflow: hidden;
         height: 100vh;
-        font-size: 0.8vw;
         font-family: Arial, Helvetica, sans-serif;
+      }
+
+      body::before,
+      body::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        background-image: linear-gradient(to right, black, transparent);
+        height: 100%;
+        width: 80px;
+        z-index: 1;
+      }
+
+      body::after {
+        left: auto;
+        right: 0;
+        transform: rotate(180deg);
       }
   
       ul {
@@ -28,6 +44,9 @@
         margin: 0;
         padding: 0;
         list-style-type: none;
+        position: relative;
+        width: 0;
+        transition: transform .5s;
       }
   
       li {
@@ -41,7 +60,7 @@
       li.current              { --color: var(--color-primary); }
       li.current::before      { --color: var(--color-secondary); }
       li.current ~ li         { --color: var(--color-off); }
-      
+
       li.jumping              { --color: var(--color-off); }
       li.jumping::before      { --color: var(--color-primary); }
       li.jumping ~ li         { --color: var(--color-off); }
@@ -49,10 +68,10 @@
       li::after {
         content: "";
         box-sizing: border-box;
-        width: .6vw;
-        height: .6vw;
+        width: 10px;
+        height: 10px;
         border-radius: 50%;
-        border: .2vw solid var(--color);
+        border: 2px solid var(--color);
         transition-property: border-color, background-color;
         transition-duration: .5s;
       }
@@ -64,20 +83,21 @@
       li + li::before {
         content: "";
         display: block;
-        width: 3vw;
+        width: 35px;
         height: 2px;
-        margin: 0 .2vw;
+        margin: 0 2px;
         background-color: var(--color);
         transition: background-color .5s;
       }
   
       li > span {
         position: absolute;
-        right: .3vw;
-        transform: translate(50%, 1.1vw);
+        right: 5px;
+        transform: translate(50%, 20px);
         width: 14ch;
+        font-size: 12px;
         text-align: center;
-        line-height: .9;
+        line-height: 1;
         color: var(--color-off);
         transition: color .5s;
       }
@@ -87,7 +107,7 @@
       }
   
       li:nth-child(odd) > span {
-        transform: translate(50%, -1.1vw);
+        transform: translate(50%, -20px);
       }
 
       @keyframes pulse {
@@ -136,6 +156,10 @@
         isScoopable() {
           return System.scoopableClass.includes(this.starClass);
         }
+
+        getDomElementPosition() {
+          return this.el.offsetLeft + this.el.offsetWidth - 5;
+        }
       }
 
       /**
@@ -165,19 +189,23 @@
         });
       });
     
-      socket.on('system', system => {
-        console.log('system:', system);
+      socket.on('system', systemName => {
+        console.log('system:', systemName);
 
         if (lastSystem && systemList[lastSystem]) {
           systemList[lastSystem].el.classList.remove('current')
         }
 
-        if (system && systemList[system]) {
-          systemList[system].el.classList.remove('jumping');
-          systemList[system].el.classList.add('current');
+        if (systemName && systemList[systemName]) {
+          const system = systemList[systemName];
+
+          system.el.classList.remove('jumping');
+          system.el.classList.add('current');
+
+          routeEl.style.transform = `translateX(-${system.getDomElementPosition()}px)`;
         }
 
-        lastSystem = system;
+        lastSystem = systemName;
       });
       
       socket.on('jumping', system => {
