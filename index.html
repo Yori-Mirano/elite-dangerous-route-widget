@@ -16,24 +16,29 @@
         --color-primary   : white;
         --color-secondary : #02a5ec;
         --color-off       : #666;
+
+        scrollbar-width: thin;
+        scrollbar-color: #222 #000;
       }
+
+      ::-webkit-scrollbar             { height: 10px; }
+      ::-webkit-scrollbar-thumb       { background: #222; }
+      ::-webkit-scrollbar-thumb:hover { background: #555; }
+      ::-webkit-scrollbar-track:hover { background: #222; }
 
       body {
         background-color: black;
-        color: white;
         margin: 0;
         display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
         height: 100vh;
-        font-family: Arial, Helvetica, sans-serif;
+        overflow-y: hidden;
+        font-family: Helvetica, Arial, sans-serif;
       }
 
       body::before,
       body::after {
         content: "";
-        position: absolute;
+        position: fixed;
         left: 0;
         background-image: linear-gradient(to right, black, transparent);
         height: 100%;
@@ -49,12 +54,9 @@
   
       ul {
         display: flex;
-        margin: 0;
-        padding: 0;
+        margin: 0 auto;
+        padding: 0 100px;
         list-style-type: none;
-        position: relative;
-        width: 0;
-        transition: transform .5s;
       }
   
       li {
@@ -102,7 +104,7 @@
         position: absolute;
         right: 5px;
         transform: translate(50%, 20px);
-        width: 14ch;
+        width: 12ch;
         font-size: 12px;
         text-align: center;
         line-height: 1;
@@ -140,6 +142,14 @@
         return el;
       }
 
+      function centerView() {
+        if (lastSystem && systemList[lastSystem]) {
+          const currentSystemElementPosition = systemList[lastSystem].getDomElementPosition();
+          const newScrollPosition = currentSystemElementPosition - (document.body.offsetWidth / 2);
+          window.scrollTo({left: newScrollPosition, behavior: "smooth"});
+        }
+      }
+
       /**
        * System
        */
@@ -165,8 +175,12 @@
           return SCOOPABLE_STAR_CLASSES.includes(this.starClass);
         }
 
+        getPointSize() {
+          return parseInt(window.getComputedStyle(this.el,'::after').width, 10);
+        }
+
         getDomElementPosition() {
-          return this.el.offsetLeft + this.el.offsetWidth - 5;
+          return this.el.offsetLeft + this.el.offsetWidth - (this.getPointSize() / 2);
         }
       }
 
@@ -176,6 +190,8 @@
       let routeEl = createElement('ul', document.body);
       let systemList = {};
       let lastSystem;
+
+      window.addEventListener('resize', () => centerView() );
 
       /**
        * Socket.io client
@@ -193,6 +209,7 @@
           systemList[step.StarSystem] = system;
           if (lastSystem == step.StarSystem) {
             system.el.classList.add('current');
+            setTimeout(() => centerView());
           }
         });
       });
@@ -200,31 +217,28 @@
       socket.on('system', systemName => {
         console.log('system:', systemName);
 
-        if (lastSystem && systemList[lastSystem]) {
-          systemList[lastSystem].el.classList.remove('current')
-        }
-
         if (systemName && systemList[systemName]) {
           const system = systemList[systemName];
 
           system.el.classList.remove('jumping');
           system.el.classList.add('current');
-
-          routeEl.style.transform = `translateX(-${system.getDomElementPosition()}px)`;
+          setTimeout(() => centerView());
         }
 
         lastSystem = systemName;
       });
       
-      socket.on('jumping', system => {
-        console.log('jumping:', system);
+      socket.on('jumping', systemName => {
+        console.log('jumping:', systemName);
         
         if (lastSystem && systemList[lastSystem]) {
           systemList[lastSystem].el.classList.remove('current')
         }
 
-        if (system && systemList[system]) {
-          systemList[system].el.classList.add('jumping');
+        if (systemName && systemList[systemName]) {
+          systemList[systemName].el.classList.add('jumping');
+          lastSystem = systemName; 
+          setTimeout(() => centerView());
         }
       });
     </script>
