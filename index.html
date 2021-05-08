@@ -2,7 +2,15 @@
 <html>
   <head>
     <title>Elite Dangerous - Route Tracking Widget</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="black">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <script src="/socket.io/socket.io.js"></script>
+
     <style>
       :root {
         --color-primary   : white;
@@ -135,12 +143,12 @@
       /**
        * System
        */
+      const SCOOPABLE_STAR_CLASSES = [ 'O', 'B', 'A', 'F', 'G', 'K', 'M' ];
+
       class System {
         el;
         labelEl;
         starClass;
-
-        static scoopableClass = [ 'O', 'B', 'A', 'F', 'G', 'K', 'M' ];
 
         constructor(parentEl, name, starClass) {
           this.el = createElement('li', parentEl);
@@ -154,7 +162,7 @@
         }
 
         isScoopable() {
-          return System.scoopableClass.includes(this.starClass);
+          return SCOOPABLE_STAR_CLASSES.includes(this.starClass);
         }
 
         getDomElementPosition() {
