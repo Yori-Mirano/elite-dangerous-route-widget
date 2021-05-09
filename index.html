@@ -26,13 +26,14 @@
       ::-webkit-scrollbar-thumb:hover { background: #555; }
       ::-webkit-scrollbar-track:hover { background: #222; }
 
+      :root, body { height: 100%; }
+
       body {
         background-color: black;
         margin: 0;
         display: flex;
-        height: 100vh;
         overflow-y: hidden;
-        font-family: Helvetica, Arial, sans-serif;
+        font-family: Arial, sans-serif;
       }
 
       body::before,
@@ -81,13 +82,41 @@
         width: 10px;
         height: 10px;
         border-radius: 50%;
-        border: 2px solid var(--color);
-        transition-property: border-color, background-color;
+        color: var(--color);
+        border: 2px solid;
+        transition-property: color, background-color;
         transition-duration: .5s;
       }
 
       li.scoopable::after {
         background-color: var(--color);
+      }
+
+      li.supercharge::after,
+      li.white-dwarf::after {
+        content: "¦";
+        font-size: 22px;
+        padding-bottom: 3px;
+        justify-content: center;
+        align-items: center;
+        display: flex;
+        width: 8px;
+        height: 8px;
+        margin: 1px;
+        transform: rotate(45deg);
+      }
+
+      li.white-dwarf::after {
+        width: 14px;
+        height: 14px;
+        margin: 0;
+      }
+      
+      li.black-hole::after {
+        border: none;
+        width: 16px;
+        height: 16px;
+        background-image: radial-gradient(transparent 0%, var(--color) 32%, transparent 45%, transparent 50%, var(--color) 60%);
       }
   
       li + li::before {
@@ -176,10 +205,34 @@
           if (this.isScoopable()) {
             this.el.classList.add('scoopable');
           }
+
+          if (this.isSupercharge()) {
+            this.el.classList.add('supercharge');
+          }
+
+          if (this.isWhiteDwarf()) {
+            this.el.classList.add('white-dwarf');
+          }
+
+          if (this.isBlackHole()) {
+            this.el.classList.add('black-hole');
+          }
         }
 
         isScoopable() {
           return SCOOPABLE_STAR_CLASSES.includes(this.starClass);
+        }
+
+        isSupercharge() {
+          return this.starClass.match(/^(N|D.*)$/) !== null;
+        }
+
+        isWhiteDwarf() {
+          return this.starClass.match(/^D/) !== null;
+        }
+
+        isBlackHole() {
+          return this.starClass === 'H';
         }
 
         getPointSize() {
