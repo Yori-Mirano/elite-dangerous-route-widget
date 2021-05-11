@@ -13,9 +13,9 @@
 
     <style>
       :root {
-        --color-primary   : white;
-        --color-secondary : #02a5ec;
-        --color-off       : #666;
+        --color-theme : #ff9b00;
+        --color-on    : white;
+        --color-off   : #666;
 
         scrollbar-width: thin;
         scrollbar-color: #222 #000;
@@ -71,8 +71,8 @@
         box-shadow: 0 0 30px 30px black;
       }
 
-      .info * :first-child { color: var(--color-primary); }
-      .info * :last-child { color: var(--color-secondary); }
+      .info * :first-child { color: var(--color-on); }
+      .info * :last-child { color: var(--color-theme); }
 
 
       /**
@@ -92,14 +92,14 @@
         position: relative;
       }
 
-      li                      { --color: var(--color-secondary); }
+      li                      { --color: var(--color-theme); }
 
-      li.current              { --color: var(--color-primary); }
-      li.current::before      { --color: var(--color-secondary); }
+      li.current              { --color: var(--color-on); }
+      li.current::before      { --color: var(--color-theme); }
       li.current ~ li         { --color: var(--color-off); }
 
       li.jumping              { --color: var(--color-off); }
-      li.jumping::before      { --color: var(--color-primary); }
+      li.jumping::before      { --color: var(--color-on); }
       li.jumping ~ li         { --color: var(--color-off); }
   
       li::after {
@@ -168,7 +168,7 @@
       }
 
       li.current > span {
-        color: var(--color-primary);
+        color: var(--color-on);
       }
   
       li:nth-child(odd) > span {
@@ -188,7 +188,7 @@
       }
 
       li.jumping > span {
-        color: var(--color-primary);
+        color: var(--color-on);
       }
 
       li.compact:not(.current):not(.jumping) + li.compact:not(.current):not(.jumping):not(:first-child):not(:last-child)::before {
@@ -430,6 +430,10 @@
        * Socket.io client
        */
       var socket = io();
+
+      socket.on('config', config => {
+        document.documentElement.style.setProperty('--color-theme', '#' + config.themeColor);
+      });
     
       socket.on('route', route => {
         console.log('route:', route);

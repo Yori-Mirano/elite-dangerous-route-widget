@@ -3,8 +3,9 @@
  */
 const fs = require('fs');
 const homedir = require('os').homedir();
-const config = require('./config.json');
-const baseDir = config.edLogDir.replace('%userprofile%', homedir);
+const YAML = require('yaml')
+const config = YAML.parse(fs.readFileSync('./config.yml', 'utf8'));
+const baseDir = config.server.eliteLogDir.replace('%userprofile%', homedir);
 const files = {
   route: baseDir + '/NavRoute.json'
 }
@@ -148,6 +149,8 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
   console.log(new Date(), 'a user connected');
 
+  socket.emit('config', config.client);
+  
   if (route)          { socket.emit('route', route); }
   if (currentSystem)  { socket.emit('system', currentSystem); }
   if (isJumping)      { socket.emit('jumping', currentSystem); }
