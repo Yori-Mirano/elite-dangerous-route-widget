@@ -33,7 +33,7 @@
         margin: 0;
         display: flex;
         overflow-y: hidden;
-        font-family: Arial, sans-serif;
+        font-family: Verdana, sans-serif;
       }
 
       body::before,
@@ -60,7 +60,7 @@
         position: fixed;
         color: white;
         padding: 0 10px;
-        font-size: 10px;
+        font-size: 12px;
         z-index: 2;
         right: 0;
         background-color: black;
@@ -81,8 +81,8 @@
       ul {
         display: flex;
         margin: 0 auto;
-        padding: 0 100px;
-        padding-right: 180px;
+        padding-left: 100px;
+        padding-right: 220px;
         list-style-type: none;
       }
   
@@ -122,7 +122,7 @@
       li.white-dwarf::after {
         content: "¦";
         font-size: 22px;
-        padding-bottom: 3px;
+        padding-bottom: 5px;
         justify-content: center;
         align-items: center;
         display: flex;
@@ -152,7 +152,7 @@
         height: 2px;
         margin: 0 2px;
         background-color: var(--color);
-        transition: background-color .5s;
+        transition: all .5s;
       }
   
       li > span {
@@ -164,7 +164,7 @@
         text-align: center;
         line-height: 1;
         color: var(--color-off);
-        transition: color .5s;
+        transition: opacity .5s, color .5s;
       }
 
       li.current > span {
@@ -189,6 +189,14 @@
 
       li.jumping > span {
         color: var(--color-primary);
+      }
+
+      li.compact:not(.current):not(.jumping) + li.compact:not(.current):not(.jumping):not(:first-child):not(:last-child)::before {
+        width: 0;
+      }
+
+      li.compact:not(.current):not(.jumping):not(:first-child):not(:last-child) > span {
+        opacity: 0;
       }
     </style>
   </head>
@@ -322,8 +330,8 @@
         updateView() {
           this.el.innerHTML = `
             <div>
-              <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--color-off); padding-bottom: 4px; margin-bottom: 5px;">
-                <div style="font-size: 15px; font-weight: bold;"><span>${this.getRemainingTime()}</span><div style="font-size: 10px;">min</div></div>
+              <div style="display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 1px solid var(--color-off); padding-bottom: 4px; margin-bottom: 5px;">
+                <div style="font-size: 17px; font-weight: bold; line-height: 1; text-align: right;"><span>${this.getRemainingTime()}</span><div style="font-size: 11px;"> min</div></div>
                 <div style="margin-left: 8px;">
                   <div><span>${this.getArrivalDistance()}</span><span> ly</span></div>
                   <div><span>${this.remainingJumps}</span><span> jmp</span></div>
@@ -335,7 +343,7 @@
                   <div><span>${Math.round(this.getLightYearPerJump() * this.getJumpsPerHour())}</span><span> ly/h</span></div>
                   <div><span>${Math.round(this.getLightYearPerJump())}</span><span> ly/jmp</span></div>
                 </div>
-                <div style="margin-left: 8px; text-align: right;">
+                <div style="margin-left: 10px; text-align: right;">
                   <div><span>${this.getJumpsPerHour()}</span><span> jmp/h</span></div>
                   <div><span>${this.getSecondsPerJump()}</span><span> s/jmp</span></div>
                 </div>
@@ -361,6 +369,10 @@
           this.labelEl.innerHTML = name;
           this.starClass = starClass;
           this.position = position;
+
+          if (name.match(/\d/) !== null) {
+            this.el.classList.add('compact');
+          }
 
           if (this.isScoopable()) {
             this.el.classList.add('scoopable');
@@ -485,6 +497,7 @@
         }
 
         info.jump(systemList[systemName].system.position);
+        info.setRemainingJump(systemList[systemName].remainingJump);
 
         if (systemList[systemName].remainingJump === 0) {
           info.endOfRoute();
