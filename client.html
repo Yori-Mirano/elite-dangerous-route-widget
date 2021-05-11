@@ -13,21 +13,18 @@
 
     <style>
       :root {
-        --gui-size-factor : 1;
-        --color-theme     : #ff8b00;
-        --color-on        : white;
-        --color-off       : #666;
+        --gui-size-factor  : 1;
+        --color-theme      : #ff8b00;
+        --color-on         : white;
+        --color-off        : #fff6;
+        --color-background : #0008;
 
-        scrollbar-width: thin;
-        scrollbar-color: #222 #000;
+        scrollbar-width: none;
 
-        font-size: calc(var(--gui-size-factor) * 62.5%); /* 1rem = 1rem */
+        font-size: calc(var(--gui-size-factor) * 62.5%); /* 1rem = 10px */
       }
 
-      ::-webkit-scrollbar             { height: 1rem; }
-      ::-webkit-scrollbar-thumb       { background: #222; }
-      ::-webkit-scrollbar-thumb:hover { background: #555; }
-      ::-webkit-scrollbar-track:hover { background: #222; }
+      ::-webkit-scrollbar             { display: none; }
 
       :root, body { height: 100%; }
 
@@ -35,43 +32,23 @@
         background-color: black;
         margin: 0;
         display: flex;
-        overflow-y: hidden;
+        overflow: hidden;
         font-family: Verdana, sans-serif;
-      }
-
-      body::before,
-      body::after {
-        content: "";
-        position: fixed;
-        left: 0;
-        background-image: linear-gradient(to right, black, transparent);
-        height: 100%;
-        width: 8rem;
-        z-index: 1;
-      }
-
-      body::after {
-        left: auto;
-        right: 0;
-        transform: rotate(180deg);
+        text-shadow: 0 0 .5rem var(--color-background);
       }
   
       /**
        * Info
        */
       .info {
-        position: fixed;
+        flex-shrink: 0;
         color: white;
         padding: 0 1rem;
         font-size: 1.2rem;
-        z-index: 2;
-        right: 0;
-        background-color: black;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        height: 100%;
-        box-shadow: 0 0 3rem 3rem black;
+        background-image: radial-gradient(var(--color-background), transparent 66%, transparent);
       }
 
       .info * :first-child { color: var(--color-on); }
@@ -81,11 +58,18 @@
       /**
        * Route
        */
+      .route-container {
+        flex-grow: 1;
+        display: flex;
+        overflow-y: hidden;
+        background-image: radial-gradient(var(--color-background), transparent 66%, transparent);
+        -webkit-mask-image: linear-gradient(to right, transparent, black 6rem, black calc(100% - 6rem), transparent);
+      }
+
       ul {
         display: flex;
         margin: 0 auto;
-        padding-left: 10rem;
-        padding-right: 22rem;
+        padding: 0 10rem;
         list-style-type: none;
       }
   
@@ -118,6 +102,7 @@
       }
 
       li.scoopable::after {
+        border-width: 0;
         background-color: var(--color);
       }
 
@@ -129,6 +114,8 @@
         justify-content: center;
         align-items: center;
         display: flex;
+        border-top: none;
+        border-bottom: none;
         width: .8rem;
         height: .8rem;
         margin: .1rem;
@@ -227,8 +214,8 @@
       function centerView() {
         if (lastSystem && systemList[lastSystem]) {
           const currentSystemElementPosition = systemList[lastSystem].system.getDomElementPosition();
-          const newScrollPosition = currentSystemElementPosition - (document.body.offsetWidth / 2);
-          window.scrollTo({left: newScrollPosition, behavior: "smooth"});
+          const newScrollPosition = currentSystemElementPosition - (routeContainerEl.offsetWidth / 2);
+          routeContainerEl.scrollTo({left: newScrollPosition, behavior: "smooth"});
         }
       }
 
@@ -422,10 +409,13 @@
       /**
        * Init
        */
-      let routeEl = createElement(document.body, 'ul');
+      let routeContainerEl = createElement();
+      let routeEl = createElement(routeContainerEl, 'ul');
       let systemList = {};
       let lastSystem;
       const info = new Info();
+
+      routeContainerEl.classList.add('route-container');
 
       window.addEventListener('resize', () => centerView() );
 
@@ -436,7 +426,8 @@
 
       socket.on('config', config => {
         document.documentElement.style.setProperty('--gui-size-factor', config.guiSizeFactor);
-        document.documentElement.style.setProperty('--color-theme', '#' + config.themeColor);
+        document.documentElement.style.setProperty('--color-theme', config.themeColor);
+        document.documentElement.style.setProperty('--color-background', config.backgroundColor);
       });
     
       socket.on('route', route => {

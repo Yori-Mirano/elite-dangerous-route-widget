@@ -1,6 +1,7 @@
 server:
-  eliteLogDir: %userprofile%/Saved Games/Frontier Developments/Elite Dangerous
+  eliteLogDir:      '%userprofile%/Saved Games/Frontier Developments/Elite Dangerous'
   
 client:
-  themeColor: ff8b00 # orange: ff8b00, blue: 02a5ec
-  guiSizeFactor: 1.0
+  themeColor:       '#ff8b00' # orange: #ff8b00, blue: #02a5ec
+  backgroundColor:  '#0008'   # translucent black: #0008, transparent: transparent
+  guiSizeFactor:    1.0
