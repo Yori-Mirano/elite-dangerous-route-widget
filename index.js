@@ -42,6 +42,7 @@ watchRoute();
 const glob = require('glob')
 const lineReader = require('line-reader');
 let currentSystem;
+let lastJumpSystem;
 let lastSystem;
 let isJumping = false;
 let lastLogFilePath;
@@ -87,6 +88,7 @@ function watchLogFromMostRecentFile() {
 function dispatchLogEvents() {
   lineReader.eachLine(lastLogFilePath, function(line, last) {
     const log = JSON.parse(line);
+    let nextSystem;
 
     switch (log.event) {
       case 'StartJump':
@@ -113,12 +115,13 @@ function dispatchLogEvents() {
   
     if (last) {
       if (isJumping) {
-        if (nextSystem !== currentSystem) {
+        if (nextSystem && nextSystem !== lastJumpSystem) {
           console.log(new Date(), 'jumping: ', nextSystem);
+          lastJumpSystem = nextSystem;
           if (io) { io.emit('jumping', nextSystem); }
         }
 
-      } else if (currentSystem !== lastSystem) {
+      } else if (currentSystem && currentSystem !== lastSystem) {
         console.log(new Date(), 'system: ', currentSystem);
         lastSystem = currentSystem;
         if (io) { io.emit('system', currentSystem); }

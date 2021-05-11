@@ -53,10 +53,36 @@
         transform: rotate(180deg);
       }
   
+      /**
+       * Info
+       */
+      .info {
+        position: fixed;
+        color: white;
+        padding: 0 10px;
+        font-size: 10px;
+        z-index: 2;
+        right: 0;
+        background-color: black;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+        box-shadow: 0 0 30px 30px black;
+      }
+
+      .info * :first-child { color: var(--color-primary); }
+      .info * :last-child { color: var(--color-secondary); }
+
+
+      /**
+       * Route
+       */
       ul {
         display: flex;
         margin: 0 auto;
         padding: 0 100px;
+        padding-right: 180px;
         list-style-type: none;
       }
   
@@ -172,17 +198,149 @@
       /**
        * Helpers
        */
-      function createElement(tagName, parentEl) {
+      function createElement(parentEl = document.body, tagName = 'div') {
         const el = document.createElement(tagName);
         parentEl.appendChild(el);
         return el;
       }
 
+      
+      function getDistance(positionA, positionB) {
+        return Math.sqrt(
+          Math.pow(positionA.x - positionB.x, 2)
+          + Math.pow(positionA.y - positionB.y, 2)
+          + Math.pow(positionA.z - positionB.z, 2)
+        );
+      }
+
       function centerView() {
         if (lastSystem && systemList[lastSystem]) {
-          const currentSystemElementPosition = systemList[lastSystem].getDomElementPosition();
+          const currentSystemElementPosition = systemList[lastSystem].system.getDomElementPosition();
           const newScrollPosition = currentSystemElementPosition - (document.body.offsetWidth / 2);
           window.scrollTo({left: newScrollPosition, behavior: "smooth"});
+        }
+      }
+
+      /**
+       * Infos
+       */
+      class Info {
+        el;
+        remainingJumps;
+        lastJumpDatetimeInMilliseconds;
+        _remainingMinutes;
+        _position;
+        _totalJumpDurationInSeconds = 0;
+        _totalJumpDistance = 0;
+        _jumpTotalForDurationStat = 0;
+        _jumpTotalForDistanceStat = 0;
+        
+
+        constructor() {
+          this.el = createElement();
+          this.el.classList.add('info');
+          this.updateView();
+        }
+
+        setRemainingJump(remainingJump) {
+          this.remainingJumps = remainingJump;
+          this.updateView();
+        }
+
+        jump(position) {
+          this._updateMillisecondsPerJumpStat();
+          this._updateLightYearPerJumpStat(position);
+          this.updateView();
+        }
+
+        setPosition(position) {
+          this._position = position;
+          this.updateView();
+        }
+
+        setArrivalPosition(position) {
+          this._arrivalPosition = position;
+          this.updateView();
+        }
+
+        getArrivalDistance() {
+          let distance;
+
+          if (this._position && this._arrivalPosition) {
+            distance = getDistance(this._position, this._arrivalPosition);
+          }
+          
+          return Math.round(distance);
+        }
+
+        endOfRoute() {
+          this.lastJumpDatetimeInMilliseconds = null;
+          this._position = null;
+        }
+
+        _updateMillisecondsPerJumpStat() { 
+          const now = Date.now();
+
+          if (this.lastJumpDatetimeInMilliseconds) {
+            const jumpDurationInMilliseconds = now - this.lastJumpDatetimeInMilliseconds;
+            this._totalJumpDurationInSeconds += jumpDurationInMilliseconds / 1000;
+            this._jumpTotalForDurationStat++;
+          }
+
+          this.lastJumpDatetimeInMilliseconds = now;
+        }
+
+        _updateLightYearPerJumpStat(position) {
+          if (this._position) {
+            const jumpDistance = getDistance(this._position, position);
+            this._totalJumpDistance += jumpDistance;
+            this._jumpTotalForDistanceStat++;
+          }
+
+          this.setPosition(position);
+        }
+
+        getLightYearPerJump() {
+          return (this._totalJumpDistance / this._jumpTotalForDistanceStat)
+              || (this.getArrivalDistance() / this.remainingJumps);
+        }
+
+        getSecondsPerJump() {
+          return Math.round(this._totalJumpDurationInSeconds / this._jumpTotalForDurationStat)
+              || 60;
+        }
+
+        getRemainingTime() {
+          return Math.round(this.getSecondsPerJump() * this.remainingJumps / 60)
+              || 0;
+        }
+
+        getJumpsPerHour() {
+          return Math.round(60 * 60 / this.getSecondsPerJump());
+        }
+
+        updateView() {
+          this.el.innerHTML = `
+            <div>
+              <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--color-off); padding-bottom: 4px; margin-bottom: 5px;">
+                <div style="font-size: 15px; font-weight: bold;"><span>${this.getRemainingTime()}</span><div style="font-size: 10px;">min</div></div>
+                <div style="margin-left: 8px;">
+                  <div><span>${this.getArrivalDistance()}</span><span> ly</span></div>
+                  <div><span>${this.remainingJumps}</span><span> jmp</span></div>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: space-between;">
+                <div>
+                  <div><span>${Math.round(this.getLightYearPerJump() * this.getJumpsPerHour())}</span><span> ly/h</span></div>
+                  <div><span>${Math.round(this.getLightYearPerJump())}</span><span> ly/jmp</span></div>
+                </div>
+                <div style="margin-left: 8px; text-align: right;">
+                  <div><span>${this.getJumpsPerHour()}</span><span> jmp/h</span></div>
+                  <div><span>${this.getSecondsPerJump()}</span><span> s/jmp</span></div>
+                </div>
+              </div>
+            </div>`;
         }
       }
 
@@ -195,12 +353,14 @@
         el;
         labelEl;
         starClass;
+        position;
 
-        constructor(parentEl, name, starClass) {
-          this.el = createElement('li', parentEl);
-          this.labelEl = createElement('span', this.el);
+        constructor(parentEl, name, starClass, position) {
+          this.el = createElement(parentEl, 'li');
+          this.labelEl = createElement(this.el, 'span');
           this.labelEl.innerHTML = name;
           this.starClass = starClass;
+          this.position = position;
 
           if (this.isScoopable()) {
             this.el.classList.add('scoopable');
@@ -247,9 +407,10 @@
       /**
        * Init
        */
-      let routeEl = createElement('ul', document.body);
+      let routeEl = createElement(document.body, 'ul');
       let systemList = {};
       let lastSystem;
+      const info = new Info();
 
       window.addEventListener('resize', () => centerView() );
 
@@ -264,12 +425,31 @@
         routeEl.innerHTML = '';
         systemList = {};
 
-        route.forEach(step => {
-          const system = new System(routeEl, step.StarSystem, step.StarClass);
-          systemList[step.StarSystem] = system;
+        route.forEach((step, index) => {
+          const system = new System(
+            routeEl,
+            step.StarSystem,
+            step.StarClass,
+            {
+              x: step.StarPos[0],
+              y: step.StarPos[1],
+              z: step.StarPos[2]
+            });
+
+          systemList[step.StarSystem] = {
+            remainingJump: route.length -1 - index,
+            system: system
+          };
+
+          if (systemList[step.StarSystem].remainingJump === 0) {
+            info.setArrivalPosition(systemList[step.StarSystem].system.position);
+          }
+
           if (lastSystem == step.StarSystem) {
             system.el.classList.add('current');
             setTimeout(() => centerView());
+            info.setPosition(systemList[step.StarSystem].system.position);
+            info.setRemainingJump(systemList[lastSystem].remainingJump);
           }
         });
       });
@@ -278,12 +458,15 @@
         console.log('system:', systemName);
 
         if (systemName && systemList[systemName]) {
-          const system = systemList[systemName];
+          const system = systemList[systemName].system;
 
           system.el.classList.remove('jumping');
           system.el.classList.add('current');
           setTimeout(() => centerView());
         }
+
+        info.setPosition(systemList[systemName].system.position);
+        info.setRemainingJump(systemList[systemName].remainingJump);
 
         lastSystem = systemName;
       });
@@ -292,13 +475,19 @@
         console.log('jumping:', systemName);
         
         if (lastSystem && systemList[lastSystem]) {
-          systemList[lastSystem].el.classList.remove('current')
+          systemList[lastSystem].system.el.classList.remove('current')
         }
 
         if (systemName && systemList[systemName]) {
-          systemList[systemName].el.classList.add('jumping');
+          systemList[systemName].system.el.classList.add('jumping');
           lastSystem = systemName; 
           setTimeout(() => centerView());
+        }
+
+        info.jump(systemList[systemName].system.position);
+
+        if (systemList[systemName].remainingJump === 0) {
+          info.endOfRoute();
         }
       });
     </script>
