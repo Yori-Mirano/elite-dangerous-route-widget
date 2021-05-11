@@ -13,15 +13,18 @@
 
     <style>
       :root {
-        --color-theme : #ff8b00;
-        --color-on    : white;
-        --color-off   : #666;
+        --gui-size-factor : 1;
+        --color-theme     : #ff8b00;
+        --color-on        : white;
+        --color-off       : #666;
 
         scrollbar-width: thin;
         scrollbar-color: #222 #000;
+
+        font-size: calc(var(--gui-size-factor) * 62.5%); /* 1rem = 1rem */
       }
 
-      ::-webkit-scrollbar             { height: 10px; }
+      ::-webkit-scrollbar             { height: 1rem; }
       ::-webkit-scrollbar-thumb       { background: #222; }
       ::-webkit-scrollbar-thumb:hover { background: #555; }
       ::-webkit-scrollbar-track:hover { background: #222; }
@@ -43,7 +46,7 @@
         left: 0;
         background-image: linear-gradient(to right, black, transparent);
         height: 100%;
-        width: 80px;
+        width: 8rem;
         z-index: 1;
       }
 
@@ -59,8 +62,8 @@
       .info {
         position: fixed;
         color: white;
-        padding: 0 10px;
-        font-size: 12px;
+        padding: 0 1rem;
+        font-size: 1.2rem;
         z-index: 2;
         right: 0;
         background-color: black;
@@ -68,7 +71,7 @@
         flex-direction: column;
         justify-content: center;
         height: 100%;
-        box-shadow: 0 0 30px 30px black;
+        box-shadow: 0 0 3rem 3rem black;
       }
 
       .info * :first-child { color: var(--color-on); }
@@ -81,8 +84,8 @@
       ul {
         display: flex;
         margin: 0 auto;
-        padding-left: 100px;
-        padding-right: 220px;
+        padding-left: 10rem;
+        padding-right: 22rem;
         list-style-type: none;
       }
   
@@ -105,11 +108,11 @@
       li::after {
         content: "";
         box-sizing: border-box;
-        width: 10px;
-        height: 10px;
+        width: 1rem;
+        height: 1rem;
         border-radius: 50%;
         color: var(--color);
-        border: 2px solid;
+        border: .2rem solid;
         transition-property: color, background-color;
         transition-duration: .5s;
       }
@@ -121,46 +124,46 @@
       li.supercharge::after,
       li.white-dwarf::after {
         content: "¦";
-        font-size: 22px;
-        padding-bottom: 5px;
+        font-size: 2.2rem;
+        padding-bottom: .5rem;
         justify-content: center;
         align-items: center;
         display: flex;
-        width: 8px;
-        height: 8px;
-        margin: 1px;
+        width: .8rem;
+        height: .8rem;
+        margin: .1rem;
         transform: rotate(45deg);
       }
 
       li.white-dwarf::after {
-        width: 14px;
-        height: 14px;
+        width: 1.4rem;
+        height: 1.4rem;
         margin: 0;
       }
       
       li.black-hole::after {
         border: none;
-        width: 16px;
-        height: 16px;
+        width: 1.6rem;
+        height: 1.6rem;
         background-image: radial-gradient(transparent 0%, var(--color) 32%, transparent 45%, transparent 50%, var(--color) 60%);
       }
   
       li + li::before {
         content: "";
         display: block;
-        width: 35px;
-        height: 2px;
-        margin: 0 2px;
+        width: 3.5rem;
+        height: .2rem;
+        margin: 0 .2rem;
         background-color: var(--color);
         transition: all .5s;
       }
   
       li > span {
         position: absolute;
-        right: 5px;
-        transform: translate(50%, 20px);
+        right: .5rem;
+        transform: translate(50%, 2rem);
         width: 12ch;
-        font-size: 12px;
+        font-size: 1.2rem;
         text-align: center;
         line-height: 1;
         color: var(--color-off);
@@ -172,7 +175,7 @@
       }
   
       li:nth-child(odd) > span {
-        transform: translate(50%, -20px);
+        transform: translate(50%, -2rem);
       }
 
       @keyframes pulse {
@@ -330,9 +333,9 @@
         updateView() {
           this.el.innerHTML = `
             <div>
-              <div style="display: flex; align-items: flex-end; justify-content: space-between; border-bottom: 1px solid var(--color-off); padding-bottom: 4px; margin-bottom: 5px;">
-                <div style="font-size: 17px; font-weight: bold; line-height: 1; text-align: right;"><span>${this.getRemainingTime()}</span><div style="font-size: 11px;"> min</div></div>
-                <div style="margin-left: 8px;">
+              <div style="display: flex; align-items: flex-end; justify-content: space-between; border-bottom: .1rem solid var(--color-off); padding-bottom: .4rem; margin-bottom: .5rem;">
+                <div style="font-size: 1.7rem; font-weight: bold; line-height: 1; text-align: right;"><span>${this.getRemainingTime()}</span><div style="font-size: 1.1rem;"> min</div></div>
+                <div style="margin-left: .8rem;">
                   <div><span>${this.getArrivalDistance()}</span><span> ly</span></div>
                   <div><span>${this.remainingJumps}</span><span> jmp</span></div>
                 </div>
@@ -343,7 +346,7 @@
                   <div><span>${Math.round(this.getLightYearPerJump() * this.getJumpsPerHour())}</span><span> ly/h</span></div>
                   <div><span>${Math.round(this.getLightYearPerJump())}</span><span> ly/jmp</span></div>
                 </div>
-                <div style="margin-left: 10px; text-align: right;">
+                <div style="margin-left: 1rem; text-align: right;">
                   <div><span>${this.getJumpsPerHour()}</span><span> jmp/h</span></div>
                   <div><span>${this.getSecondsPerJump()}</span><span> s/jmp</span></div>
                 </div>
@@ -432,6 +435,7 @@
       var socket = io();
 
       socket.on('config', config => {
+        document.documentElement.style.setProperty('--gui-size-factor', config.guiSizeFactor);
         document.documentElement.style.setProperty('--color-theme', '#' + config.themeColor);
       });
     
