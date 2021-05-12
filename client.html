@@ -16,7 +16,7 @@
         --gui-size-factor   : 1;
         --color-theme       : #ff8b00;
         --color-on          : white;
-        --color-off         : #fff6;
+        --color-off         : var(--color-on);
         --color-background  : #0008;
         --color-off-alpha   : .5;
 
@@ -81,18 +81,18 @@
       }
 
       li                      { --color: var(--color-theme); }
-      li > span               { opacity: var(--color-off-alpha); }
+      li > span               { opacity: var(--color-off-alpha); --color: var(--color-off); }
 
       li.current              { --color: var(--color-on); }
       li.current::before      { --color: var(--color-theme); }
       li.current ~ li::before,
-      li.current ~ li::after  { opacity: var(--color-off-alpha); }
+      li.current ~ li::after  { opacity: var(--color-off-alpha); --color: var(--color-off); }
 
       li.jumping::after,
       li.jumping::before      { --color: var(--color-on); }
       li.jumping::after,
       li.jumping ~ li::before,
-      li.jumping ~ li::after  { opacity: var(--color-off-alpha); }
+      li.jumping ~ li::after  { opacity: var(--color-off-alpha); --color: var(--color-off); }
   
       li::after {
         content: "";
@@ -437,6 +437,7 @@
         document.documentElement.style.setProperty('--gui-size-factor', config.guiSizeFactor);
         document.documentElement.style.setProperty('--color-theme', config.themeColor);
         document.documentElement.style.setProperty('--color-background', config.backgroundColor);
+        document.documentElement.style.setProperty('--color-off', config.fullColor ? 'var(--color-theme)' : 'var(--color-on)');
       });
     
       socket.on('route', route => {
