@@ -4,6 +4,11 @@
 const fs = require('fs');
 const homedir = require('os').homedir();
 const YAML = require('yaml')
+
+if (!fs.existsSync('./config.yml')) {
+  fs.copyFileSync('./config.sample.yml', './config.yml', fs.constants.COPYFILE_EXCL);
+}
+
 const config = YAML.parse(fs.readFileSync('./config.yml', 'utf8'));
 const baseDir = config.server.eliteLogDir.replace('%userprofile%', homedir);
 const files = {
@@ -154,6 +159,15 @@ io.on('connection', (socket) => {
   if (route)          { socket.emit('route', route); }
   if (currentSystem)  { socket.emit('system', currentSystem); }
   if (isJumping)      { socket.emit('jumping', currentSystem); }
+  
+
+  socket.on('config', clientConfig => {
+    console.log(new Date(), 'config: receive');
+    config.client = clientConfig;
+    socket.broadcast.emit('config', clientConfig);
+
+    fs.writeFileSync('./config.yml', YAML.stringify(config));
+  });
 
   socket.on('disconnect', () => {
     console.log(new Date(), 'user disconnected');
