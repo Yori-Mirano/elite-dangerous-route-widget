@@ -44,3 +44,14 @@ socket.on('jumping', systemName => {
   console.log('jumping:', systemName);
   route.jump(systemName);
 });
+
+socket.on('status', status => {
+  console.log('status:', status);
+  if (typeof status.GuiFocus !== 'undefined') {
+    route.routeContainerEl.style.opacity = status.GuiFocus === 0 ? 1 : 0;
+    info.el.style.opacity = status.GuiFocus === 0 ? 1 : 0;
+  } else {
+    route.routeContainerEl.style.opacity = 0;
+    info.el.style.opacity = 0;
+  }
+});

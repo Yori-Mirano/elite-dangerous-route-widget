@@ -5,6 +5,7 @@
   align-items: center;
   overflow-y: hidden;
   -webkit-mask-image: linear-gradient(to right, transparent, black 6rem, black calc(100% - 6rem), transparent);
+  transition: opacity .5s;
 }
 
 ul {

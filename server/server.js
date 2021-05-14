@@ -9,6 +9,7 @@ const io          = new Server(server);
 const Stats       = require('./Stats');
 const Route       = require('./Route');
 const GameLog     = require('./GameLog');
+const GameStatus  = require('./GameStatus');
 
 
 /*
@@ -30,6 +31,7 @@ const homedir     = require('os').homedir();
 
 paths.eliteLogDir = config.server.eliteLogDir.replace('%userprofile%', homedir);
 paths.route       = paths.eliteLogDir + '/NavRoute.json';
+paths.status      = paths.eliteLogDir + '/Status.json';
 
 
 /*
@@ -83,6 +85,18 @@ gameLog.watchLog();
 
 
 /*
+ * GameStatus
+ */
+const gameStatus = new GameStatus(paths.status);
+
+gameStatus.onChange = gameStatus => {
+  io.emit('status', gameStatus);
+};
+
+gameStatus.watchFile();
+
+
+/*
  * Socket
  */
 io.on('connection', (socket) => {
@@ -92,6 +106,7 @@ io.on('connection', (socket) => {
   socket.emit('stats', stats.get());
   if (route.steps)            { socket.emit('route', route.steps); }
   if (gameLog.currentSystem)  { socket.emit('system', gameLog.currentSystem); }  
+  if (gameStatus.status)      { socket.emit('status', gameStatus.status); }
 
   socket.on('config', clientConfig => {
     console.log(new Date(), 'config: receive');

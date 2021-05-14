@@ -25,8 +25,7 @@ module.exports = class Route {
   }
 
   updateFromFile() {
-    const rawdata = fs.readFileSync(this.filename);
-    this.steps = JSON.parse(rawdata).Route;
+    this.steps = JSON.parse(fs.readFileSync(this.filename)).Route;
     console.log(new Date(), 'route:', this.steps.length -1, 'steps');
   
     this.update();
