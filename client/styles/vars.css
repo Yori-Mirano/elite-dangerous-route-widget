@@ -1,0 +1,12 @@
+:root {
+  --on: ;
+  --off: initial;
+
+  --gui-scale         : 1;
+  --color-theme       : #888;
+  --color-on          : white;
+  --color-off         : var(--color-on);
+  --color-off-alpha   : .5;
+  --color-background  : #0008;
+  --compact           : var(--on);
+}

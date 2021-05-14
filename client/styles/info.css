@@ -1,0 +1,13 @@
+.info {
+  flex-shrink: 0;
+  color: white;
+  padding: 2rem 4rem;
+  font-size: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-image: radial-gradient(var(--color-background) 25%, transparent 66%, transparent);
+}
+
+.info * :first-child { color: var(--color-on); }
+.info * :last-child { color: var(--color-theme); }
