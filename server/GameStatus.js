@@ -18,7 +18,7 @@ module.exports = class Status {
       if (watchTimeout) { clearTimeout(watchTimeout); } // prevent duplicated watch notifications
       
       watchTimeout = setTimeout(() => {
-        console.log(new Date(), 'watchStatus: change detected');
+        //console.log(new Date(), 'watchStatus: change detected');
         this.updateFromFile();
       }, 100);
     });

@@ -5,3 +5,12 @@ exports.getDistance = (positionA, positionB) => {
     + Math.pow(positionA[2] - positionB[2], 2)
   );
 }
+
+
+exports.getLocalIp = () => {
+  return new Promise((resolve, reject) => {
+    require('dns').lookup(require('os').hostname(), function (err, add, fam) {
+      resolve(add);
+    });
+  });
+}

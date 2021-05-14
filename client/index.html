@@ -24,13 +24,18 @@
   <body>
     <div class="config-panel">
       <label>
+        <input id="config-panel__hide" type="checkbox" onchange="gui.setHide(this.checked)"/>
+        Hide
+      </label>
+      
+      <label>
+        <input id="config-panel__autohide" type="checkbox" onchange="gui.setAutohide(this.checked)"/>
+        Autohide
+      </label>
+      
+      <label>
         <input id="config-panel__compact" type="checkbox" onchange="gui.setCompact(this.checked); route.centerView(550);"/>
         Compact
-      </label>
-
-      <label>
-        <input id="config-panel__shadow" type="checkbox" onchange="gui.setShadow(this.checked)"/>
-        Shadow
       </label>
 
       <label style="flex-grow: 1;">
@@ -41,6 +46,11 @@
             ( × <span id="config-panel__gui-scale__value">1.0</span> )
           </span>
         </span>
+      </label>
+
+      <label>
+        <input id="config-panel__shadow" type="checkbox" onchange="gui.setShadow(this.checked)"/>
+        Shadow
       </label>
 
       <label>

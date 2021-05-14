@@ -10,6 +10,7 @@ const Stats       = require('./Stats');
 const Route       = require('./Route');
 const GameLog     = require('./GameLog');
 const GameStatus  = require('./GameStatus');
+const utils       = require('./utils');
 
 
 /*
@@ -67,18 +68,21 @@ gameLog.onShipChange = ship => {
   stats.update();
 }
 
-gameLog.onJump = nextSystem => {
-  stats.jump(route.getStepByName(nextSystem).StarPos);
-  stats.setRemainingJump(route.getRemainingJump(nextSystem));
+gameLog.onJump = nextSystemName => {
+  stats.jump(route.getStepByName(nextSystemName).StarPos);
+  stats.setRemainingJump(route.getRemainingJump(nextSystemName));
   stats.update();
-  io.emit('jumping', nextSystem);
+  io.emit('jumping', nextSystemName);
 }
 
-gameLog.onLocate = system => {
-  stats.setPosition(route.getStepByName(system).StarPos);
-  stats.setRemainingJump(route.getRemainingJump(system));
-  stats.update();
-  io.emit('system', system);
+gameLog.onLocate = systemName => {
+  const system = route.getStepByName(systemName);
+  if (system) {
+    stats.setPosition(system.StarPos);
+    stats.setRemainingJump(route.getRemainingJump(systemName));
+    stats.update();
+  }
+  io.emit('system', systemName);
 }
 
 gameLog.watchLog();
@@ -100,7 +104,12 @@ gameStatus.watchFile();
  * Socket
  */
 io.on('connection', (socket) => {
-  console.log(new Date(), 'socket: a user connected');
+  let clientInfo;
+
+  socket.on('clientInfo', info => {
+    clientInfo = info;
+    console.log(new Date(), 'socket: user connected from ', clientInfo.origin, '(', clientInfo.platform, ')');
+  });
 
   socket.emit('config', config.client);
   socket.emit('stats', stats.get());
@@ -109,14 +118,14 @@ io.on('connection', (socket) => {
   if (gameStatus.status)      { socket.emit('status', gameStatus.status); }
 
   socket.on('config', clientConfig => {
-    console.log(new Date(), 'config: receive');
+    //console.log(new Date(), 'config: receive');
     config.client = clientConfig;
     socket.broadcast.emit('config', clientConfig);
     fs.writeFileSync(paths.config, YAML.stringify(config));
   });
 
   socket.on('disconnect', () => {
-    console.log(new Date(), 'socket: user disconnected');
+    console.log(new Date(), 'socket: user disconnected from ', clientInfo.origin, '(', clientInfo.platform, ')');
   });
 });
 
@@ -128,5 +137,7 @@ app.use(express.static(paths.client));
 
 server.listen(3000, () => {
   console.log(new Date(), 'server: listening on *:3000');
-  console.log('\n    Go to   http://localhost:3000   to open the widget\n');
+  console.log('\n    Go to   http://localhost:3000   to open the widget on this device\n');
 });
+
+utils.getLocalIp().then(localIp => console.log(`    Or to   http://${localIp}:3000   to open the widget from another device on the local network\n`));

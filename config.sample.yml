@@ -8,5 +8,6 @@ client:
   guiScale:     1.0
   themeColor:   '#ff7b00' # orange: #ff7b00 / blue: #02a5ec / emerald: #00ffaa
   compact:      true
+  autohide:     false
   fullColor:    false
   shadow:       true

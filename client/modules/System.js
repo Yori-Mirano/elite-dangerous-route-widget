@@ -11,11 +11,11 @@ export default class {
     this.labelEl.innerHTML  = name;
     this.starClass          = starClass;
 
-    if (name.match(/\d/) !== null)  { this.el.classList.add('compact'); }
-    if (this.isScoopable())         { this.el.classList.add('scoopable'); }
-    if (this.isSupercharge())       { this.el.classList.add('supercharge'); }
-    if (this.isWhiteDwarf())        { this.el.classList.add('white-dwarf'); }
-    if (this.isBlackHole())         { this.el.classList.add('black-hole'); }
+    if (/\d/.test(name))      { this.el.classList.add('compact'); }
+    if (this.isScoopable())   { this.el.classList.add('scoopable'); }
+    if (this.isSupercharge()) { this.el.classList.add('supercharge'); }
+    if (this.isWhiteDwarf())  { this.el.classList.add('white-dwarf'); }
+    if (this.isBlackHole())   { this.el.classList.add('black-hole'); }
   }
 
   isScoopable() {
@@ -23,11 +23,11 @@ export default class {
   }
 
   isSupercharge() {
-    return this.starClass.match(/^(N|D.*)$/) !== null;
+    return /^(N|D.*)$/.test(this.starClass);
   }
 
   isWhiteDwarf() {
-    return this.starClass.match(/^D/) !== null;
+    return /^D/.test(this.starClass);
   }
 
   isBlackHole() {

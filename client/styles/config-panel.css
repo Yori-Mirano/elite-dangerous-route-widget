@@ -2,8 +2,9 @@
   position: fixed;
   bottom: 0;
   width: 100%;
-  padding: 20px 10px;
+  padding: 0 10px;
   display: flex;
+  flex-wrap: wrap-reverse;
   align-items: flex-end;
   justify-content: center;
   z-index: 1;
@@ -35,7 +36,7 @@
 
 @media (orientation: portrait) and (min-height: 401px) {
   body {
-    padding-bottom: 120px;
+    padding-bottom: 150px;
   }
 }
 
@@ -44,7 +45,8 @@
   align-items: center;
   flex-direction: column;
   text-align: center;
-  min-width: 40px;
+  min-width: 38px;
+  margin-bottom: 20px;
 }
 
 .config-panel > * + * {

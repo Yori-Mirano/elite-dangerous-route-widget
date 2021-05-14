@@ -29,7 +29,7 @@ module.exports = class GameLog {
       if (watchTimeout) { clearTimeout(watchTimeout); } // prevent duplicated watch notifications
       
       watchTimeout = setTimeout(() => {
-        console.log(new Date(), 'watchLog: change detected');
+        //console.log(new Date(), 'watchLog: change detected');
         this.watchLogFromMostRecentFile();
       }, 100);
     });
@@ -82,6 +82,7 @@ module.exports = class GameLog {
   
         case 'Location':
         case 'FSDJump':
+        case 'CarrierJump':
           this._isJumping = false;
           this.currentSystem = log.StarSystem;
           break;

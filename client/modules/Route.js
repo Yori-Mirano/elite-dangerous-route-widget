@@ -2,17 +2,17 @@ import System            from './System.js';
 import { createElement } from './utils.js';
 
 export default class {
-  routeContainerEl;
+  el;
   routeEl;
   systemList;
   lastSystem;
   centerViewTimeout;
 
   constructor(parentEl) {
-    this.routeContainerEl = createElement(parentEl);
-    this.routeContainerEl.classList.add('route-container');
+    this.el = createElement(parentEl);
+    this.el.classList.add('route-container');
 
-    this.routeEl = createElement(this.routeContainerEl, 'ul');
+    this.routeEl = createElement(this.el, 'ul');
     this.systemList = {};
     this.lastSystem;
   }
@@ -58,14 +58,14 @@ export default class {
   }
 
   centerView(delay = 0) {
-    if (this.lastSystem && this.systemList[this.lastSystem]) {
-      clearTimeout(this.centerViewTimeout);
-
-      this.centerViewTimeout = setTimeout(() => {
+    clearTimeout(this.centerViewTimeout);
+    
+    this.centerViewTimeout = setTimeout(() => {
+      if (this.lastSystem && this.systemList[this.lastSystem]) {
         const currentSystemElementPosition = this.systemList[this.lastSystem].getDomElementPosition();
-        const newScrollPosition = currentSystemElementPosition - (this.routeContainerEl.offsetWidth / 2);
-        this.routeContainerEl.scrollTo({left: newScrollPosition, behavior: "smooth"});
-      }, delay);
-    }
+        const newScrollPosition = currentSystemElementPosition - (this.el.offsetWidth / 2);
+        this.el.scrollTo({left: newScrollPosition, behavior: "smooth"});
+      }
+    }, delay);
   }
 }

@@ -2,6 +2,10 @@ export default class {
   config = {};
   notificationTimeout;
   notificationThrottle = 250;
+  inGameMenuFocus = false;
+  onChange;
+  onShow;
+  onHide;
 
   constructor(config = {}) {
     this.setState(config);
@@ -11,10 +15,14 @@ export default class {
     this.config = config;
 
     typeof config.guiScale !== 'undefined'   && this.setScale(config.guiScale);
+    typeof config.autohide !== 'undefined'   && this.setAutohide(config.autohide);
+    typeof config.hide !== 'undefined'       && this.setHide(config.hide);
     typeof config.compact !== 'undefined'    && this.setCompact(config.compact);
     typeof config.themeColor !== 'undefined' && this.setColor(config.themeColor);
     typeof config.shadow !== 'undefined'     && this.setShadow(config.shadow);
     typeof config.fullColor !== 'undefined'  && this.setFullColor(config.fullColor);
+
+    this.updateAutohide();
   }
 
   notifyChanges() {
@@ -24,6 +32,7 @@ export default class {
       if (typeof this.onChange === 'function') {
         this.onChange(this.config);
       }
+      this.updateAutohide();
     }, this.notificationThrottle);
   }
 
@@ -44,6 +53,20 @@ export default class {
 
     if (this.config.compact !== compact) {
       this.config.compact = compact;
+      this.notifyChanges();
+    }
+  }
+
+  setAutohide(autohide) {
+    if (this.config.autohide !== autohide) {
+      this.config.autohide = autohide;
+      this.notifyChanges();
+    }
+  }
+
+  setHide(hide) {
+    if (this.config.hide !== hide) {
+      this.config.hide = hide;
       this.notifyChanges();
     }
   }
@@ -76,6 +99,38 @@ export default class {
     if (this.config.fullColor !== isFullColored) {
       this.config.fullColor = isFullColored;
       this.notifyChanges();
+    }
+  }
+
+  updateAutohide(inGameMenuFocus = null) {
+    if (inGameMenuFocus) {
+      this.inGameMenuFocus = inGameMenuFocus;
+    }
+
+    if (this.config.hide) {
+      this.hide();
+    } else {
+      if (this.config.autohide) {
+        if (this.inGameMenuFocus) {
+          this.hide();
+        } else {
+          this.show();
+        }
+      } else {
+        this.show();
+      }
+    }
+  }
+
+  show() {
+    if (typeof this.onShow === 'function') {
+      this.onShow(this.steps);
+    }
+  }
+
+  hide() {
+    if (typeof this.onHide === 'function') {
+      this.onHide(this.steps);
     }
   }
 }
