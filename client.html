@@ -14,7 +14,7 @@
     <style>
       :root {
         --gui-scale         : 1;
-        --color-theme       : #ff7b00;
+        --color-theme       : #888;
         --color-on          : white;
         --color-off         : var(--color-on);
         --color-off-alpha   : .5;
@@ -58,7 +58,7 @@
       body::before {
         opacity: 0;
         content: "";
-        background-image: linear-gradient(to top, #000e, #000c 80px, #000c calc(100% - 80px), #000e);
+        background-image: linear-gradient(to top, #000e, #000d 80px, #000d calc(100% - 80px), #000e);
         position: fixed;
         top: 0;
         left: 0;
@@ -75,12 +75,12 @@
       .info {
         flex-shrink: 0;
         color: white;
-        padding: 0 1rem;
+        padding: 2rem 4rem;
         font-size: 1.2rem;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        background-image: radial-gradient(var(--color-background), transparent 66%, transparent);
+        background-image: radial-gradient(var(--color-background) 25%, transparent 66%, transparent);
       }
 
       .info * :first-child { color: var(--color-on); }
@@ -103,9 +103,9 @@
         display: flex;
         margin: 0 auto;
         padding: 0 10rem;
-        min-height: 7.4rem;
+        min-height: 15rem;
         list-style-type: none;
-        background-image: radial-gradient(var(--color-background), transparent 66%, transparent);
+        background-image: radial-gradient(var(--color-background) 25%, transparent 66%, transparent);
       }
   
       li {
@@ -252,12 +252,14 @@
         left: 50%;
         transform: translateX(-50%);
         max-width: 600px;
-        transition: transform .2s;
+        transition-property: transform, opacity;
+        transition-duration: .2s;
       }
 
       @media (max-height: 400px ) {
         .config-panel {
           transform: translateX(-50%) translateY(100%);
+          opacity: 0;
         }
       }
 
@@ -446,15 +448,6 @@
         return el;
       }
 
-      
-      function getDistance(positionA, positionB) {
-        return Math.sqrt(
-          Math.pow(positionA.x - positionB.x, 2)
-          + Math.pow(positionA.y - positionB.y, 2)
-          + Math.pow(positionA.z - positionB.z, 2)
-        );
-      }
-
       let centerViewTimeout;
 
       function centerView(delay = 0) {
@@ -462,7 +455,7 @@
           clearTimeout(centerViewTimeout);
 
           centerViewTimeout = setTimeout(() => {
-            const currentSystemElementPosition = systemList[lastSystem].system.getDomElementPosition();
+            const currentSystemElementPosition = systemList[lastSystem].getDomElementPosition();
             const newScrollPosition = currentSystemElementPosition - (routeContainerEl.offsetWidth / 2);
             routeContainerEl.scrollTo({left: newScrollPosition, behavior: "smooth"});
           }, delay);
@@ -473,119 +466,43 @@
        * Infos
        */
       class Info {
-        el;
-        remainingJumps;
-        lastJumpDatetimeInMilliseconds;
-        _remainingMinutes;
-        _position;
-        _totalJumpDurationInSeconds = 0;
-        _totalJumpDistance = 0;
-        _jumpTotalForDurationStat = 0;
-        _jumpTotalForDistanceStat = 0;
-        
+        el;        
+        remainingJumps = 0;
+        remainingLight = 0;
+        remainingMinut = 0;
+        lightYearPerJu;
+        lightYearPerHo;
+        jumpsPerHour;  
+        secondsPerJump;
 
-        constructor() {
-          this.el = createElement();
+        constructor(el) {
+          this.el = el;
           this.el.classList.add('info');
           this.updateView();
-        }
-
-        setRemainingJump(remainingJump) {
-          this.remainingJumps = remainingJump;
-          this.updateView();
-        }
-
-        jump(position) {
-          this._updateMillisecondsPerJumpStat();
-          this._updateLightYearPerJumpStat(position);
-          this.updateView();
-        }
-
-        setPosition(position) {
-          this._position = position;
-          this.updateView();
-        }
-
-        setArrivalPosition(position) {
-          this._arrivalPosition = position;
-          this.updateView();
-        }
-
-        getArrivalDistance() {
-          let distance;
-
-          if (this._position && this._arrivalPosition) {
-            distance = getDistance(this._position, this._arrivalPosition);
-          }
-          
-          return Math.round(distance);
-        }
-
-        endOfRoute() {
-          this.lastJumpDatetimeInMilliseconds = null;
-          this._position = null;
-        }
-
-        _updateMillisecondsPerJumpStat() { 
-          const now = Date.now();
-
-          if (this.lastJumpDatetimeInMilliseconds) {
-            const jumpDurationInMilliseconds = now - this.lastJumpDatetimeInMilliseconds;
-            this._totalJumpDurationInSeconds += jumpDurationInMilliseconds / 1000;
-            this._jumpTotalForDurationStat++;
-          }
-
-          this.lastJumpDatetimeInMilliseconds = now;
-        }
-
-        _updateLightYearPerJumpStat(position) {
-          if (this._position) {
-            const jumpDistance = getDistance(this._position, position);
-            this._totalJumpDistance += jumpDistance;
-            this._jumpTotalForDistanceStat++;
-          }
-
-          this.setPosition(position);
-        }
-
-        getLightYearPerJump() {
-          return (this._totalJumpDistance / this._jumpTotalForDistanceStat)
-              || (this.getArrivalDistance() / this.remainingJumps);
-        }
-
-        getSecondsPerJump() {
-          return Math.round(this._totalJumpDurationInSeconds / this._jumpTotalForDurationStat)
-              || 60;
-        }
-
-        getRemainingTime() {
-          return Math.round(this.getSecondsPerJump() * this.remainingJumps / 60)
-              || 0;
-        }
-
-        getJumpsPerHour() {
-          return Math.round(60 * 60 / this.getSecondsPerJump());
         }
 
         updateView() {
           this.el.innerHTML = `
             <div>
               <div style="display: flex; align-items: flex-end; justify-content: space-between; border-bottom: .1rem solid #fff8; padding-bottom: .4rem; margin-bottom: .5rem; transition: border-color .5s;">
-                <div style="font-size: 1.7rem; font-weight: bold; line-height: 1; text-align: right;"><span>${this.getRemainingTime()}</span><div style="font-size: 1.1rem;"> min</div></div>
+                <div style="font-size: 1.7rem; font-weight: bold; line-height: 1; text-align: right;">
+                  <span>${Math.round(this.remainingMinutes)}</span>
+                  <div style="font-size: 1.1rem;"> min</div>
+                </div>
                 <div style="margin-left: .8rem;">
-                  <div><span>${this.getArrivalDistance()}</span><span> ly</span></div>
-                  <div><span>${this.remainingJumps}</span><span> jmp</span></div>
+                  <div><span>${Math.round(this.remainingLightYear)}</span><span> ly</span></div>
+                  <div><span>${Math.round(this.remainingJumps)}</span><span> jmp</span></div>
                 </div>
               </div>
 
               <div style="display: flex; justify-content: space-between;">
                 <div>
-                  <div><span>${Math.round(this.getLightYearPerJump() * this.getJumpsPerHour()) || '----'}</span><span> ly/hr</span></div>
-                  <div><span>${Math.round(this.getLightYearPerJump()) || '--'}</span><span> ly/jmp</span></div>
+                  <div><span>${Math.round(this.lightYearPerHour) || '----'}</span><span> ly/hr</span></div>
+                  <div><span>${Math.round(this.lightYearPerJump) || '--'}</span><span> ly/jmp</span></div>
                 </div>
                 <div style="margin-left: 1rem; text-align: right;">
-                  <div><span>${this.getJumpsPerHour()}</span><span> jmp/hr</span></div>
-                  <div><span>${this.getSecondsPerJump()}</span><span> sec/jmp</span></div>
+                  <div><span>${Math.round(this.jumpsPerHour) || '--'}</span><span> jmp/hr</span></div>
+                  <div><span>${Math.round(this.secondsPerJump) || '--'}</span><span> sec/jmp</span></div>
                 </div>
               </div>
             </div>`;
@@ -595,44 +512,26 @@
       /**
        * System
        */
-      const SCOOPABLE_STAR_CLASSES = [ 'O', 'B', 'A', 'F', 'G', 'K', 'M' ];
-
       class System {
         el;
         labelEl;
         starClass;
-        position;
 
-        constructor(parentEl, name, starClass, position) {
-          this.el = createElement(parentEl, 'li');
-          this.labelEl = createElement(this.el, 'span');
-          this.labelEl.innerHTML = name;
-          this.starClass = starClass;
-          this.position = position;
+        constructor(parentEl, name, starClass) {
+          this.el                 = createElement(parentEl, 'li');
+          this.labelEl            = createElement(this.el, 'span');
+          this.labelEl.innerHTML  = name;
+          this.starClass          = starClass;
 
-          if (name.match(/\d/) !== null) {
-            this.el.classList.add('compact');
-          }
-
-          if (this.isScoopable()) {
-            this.el.classList.add('scoopable');
-          }
-
-          if (this.isSupercharge()) {
-            this.el.classList.add('supercharge');
-          }
-
-          if (this.isWhiteDwarf()) {
-            this.el.classList.add('white-dwarf');
-          }
-
-          if (this.isBlackHole()) {
-            this.el.classList.add('black-hole');
-          }
+          if (name.match(/\d/) !== null)  { this.el.classList.add('compact'); }
+          if (this.isScoopable())         { this.el.classList.add('scoopable'); }
+          if (this.isSupercharge())       { this.el.classList.add('supercharge'); }
+          if (this.isWhiteDwarf())        { this.el.classList.add('white-dwarf'); }
+          if (this.isBlackHole())         { this.el.classList.add('black-hole'); }
         }
 
         isScoopable() {
-          return SCOOPABLE_STAR_CLASSES.includes(this.starClass);
+          return [ 'O', 'B', 'A', 'F', 'G', 'K', 'M' ].includes(this.starClass);
         }
 
         isSupercharge() {
@@ -724,7 +623,7 @@
         }
 
         setShadow(isShadowOn) {
-          document.documentElement.style.setProperty('--color-background', isShadowOn ? '#0008' : 'transparent');
+          document.documentElement.style.setProperty('--color-background', isShadowOn ? '#000C' : 'transparent');
           document.getElementById('config-panel__shadow').checked = isShadowOn;  
 
           if (this.config.shadow !== isShadowOn) {
@@ -735,6 +634,7 @@
 
         setFullColor(isFullColored) {
           document.documentElement.style.setProperty('--color-off', isFullColored ? 'var(--color-theme)' : 'var(--color-on)');
+          document.documentElement.style.setProperty('--color-off-alpha', isFullColored ? '.5' : '.4');
           document.getElementById('config-panel__full-color').checked = isFullColored;  
 
           if (this.config.fullColor !== isFullColored) {
@@ -751,7 +651,7 @@
       let routeEl = createElement(routeContainerEl, 'ul');
       let systemList = {};
       let lastSystem;
-      const info = new Info();
+      const info = new Info(createElement());
       const gui = new Gui();
 
       routeContainerEl.classList.add('route-container');
@@ -772,6 +672,18 @@
         console.log('config: emit');
         socket.emit('config', config);
       };
+
+      socket.on('stats', stats => {
+        //console.log('stats:', stats);
+        info.remainingJumps     = stats.remainingJumps;
+        info.remainingLightYear = stats.remainingLightYear;
+        info.remainingMinutes   = stats.remainingMinutes;
+        info.lightYearPerJump   = stats.lightYearPerJump;
+        info.lightYearPerHour   = stats.lightYearPerHour;
+        info.jumpsPerHour       = stats.jumpsPerHour;
+        info.secondsPerJump     = stats.secondsPerJump;
+        info.updateView();
+      });
     
       socket.on('route', route => {
         console.log('route:', route);
@@ -780,30 +692,13 @@
         systemList = {};
 
         route.forEach((step, index) => {
-          const system = new System(
-            routeEl,
-            step.StarSystem,
-            step.StarClass,
-            {
-              x: step.StarPos[0],
-              y: step.StarPos[1],
-              z: step.StarPos[2]
-            });
+          const system = new System(routeEl, step.StarSystem, step.StarClass);
 
-          systemList[step.StarSystem] = {
-            remainingJump: route.length -1 - index,
-            system: system
-          };
-
-          if (systemList[step.StarSystem].remainingJump === 0) {
-            info.setArrivalPosition(systemList[step.StarSystem].system.position);
-          }
+          systemList[step.StarSystem] = system;
 
           if (lastSystem == step.StarSystem) {
             system.el.classList.add('current');
             setTimeout(() => centerView());
-            info.setPosition(systemList[step.StarSystem].system.position);
-            info.setRemainingJump(systemList[lastSystem].remainingJump);
           }
         });
       });
@@ -812,15 +707,12 @@
         console.log('system:', systemName);
 
         if (systemName && systemList[systemName]) {
-          const system = systemList[systemName].system;
+          const system = systemList[systemName];
 
           system.el.classList.remove('jumping');
           system.el.classList.add('current');
           setTimeout(() => centerView());
         }
-
-        info.setPosition(systemList[systemName].system.position);
-        info.setRemainingJump(systemList[systemName].remainingJump);
 
         lastSystem = systemName;
       });
@@ -829,20 +721,13 @@
         console.log('jumping:', systemName);
         
         if (lastSystem && systemList[lastSystem]) {
-          systemList[lastSystem].system.el.classList.remove('current')
+          systemList[lastSystem].el.classList.remove('current')
         }
 
         if (systemName && systemList[systemName]) {
-          systemList[systemName].system.el.classList.add('jumping');
+          systemList[systemName].el.classList.add('jumping');
           lastSystem = systemName; 
           setTimeout(() => centerView());
-        }
-
-        info.jump(systemList[systemName].system.position);
-        info.setRemainingJump(systemList[systemName].remainingJump);
-
-        if (systemList[systemName].remainingJump === 0) {
-          info.endOfRoute();
         }
       });
     </script>
