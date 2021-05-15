@@ -12,6 +12,7 @@ window.gui    = gui;
 
 window.addEventListener('resize', () => route.centerView() );
 
+[route.el, info.el].forEach(el => el.classList.add('gui'));
 
 /*
  * GUI
@@ -21,13 +22,13 @@ gui.onChange = config => {
   socket.emit('config', config);
 };
 
-gui.onShow = () => {
-  [route.el, info.el].forEach(el => el.classList.remove('hidden'));
-};
 
-gui.onHide = () => {
-  [route.el, info.el].forEach(el => el.classList.add('hidden'));
-};
+/*
+ * Route
+ */
+route.onArrival = systemName => {
+  // TODO: display the arrival system name instead of the route
+}
 
 
 /*
@@ -54,20 +55,24 @@ socket.on('stats', stats => {
 socket.on('route', steps => {
   //console.log('route:', steps);
   route.setSteps(steps);
+  gui.resetAutohideTimeout(info.secondsPerJump * 2);
 });
 
 socket.on('system', systemName => {
   //console.log('system:', systemName);
   route.setCurrentSystem(systemName);
+  gui.resetAutohideTimeout(info.secondsPerJump * 2);
 });
 
 socket.on('jumping', systemName => {
   //console.log('jumping:', systemName);
   route.jump(systemName);
+  document.documentElement.classList.remove('timeout');
+  gui.clearAutohideTimeout();
 });
 
 socket.on('status', status => {
   //console.log('status:', status);
   const inGameMenuFocus = typeof status.GuiFocus === 'undefined' || status.GuiFocus !== 0;
-  gui.updateAutohide(inGameMenuFocus);
+  document.documentElement.classList.toggle('in-game-menu-focus', inGameMenuFocus);
 });

@@ -16,6 +16,12 @@
   transition-duration: .2s;
 }
 
+.gui-autohide.gui-autohide--timeout .gui,
+.gui-autohide.in-game-menu-focus .gui,
+.gui-hidden .gui {
+  opacity: 0;
+}
+
 @media (max-height: 400px ) {
   .config-panel {
     transform: translateX(-50%) translateY(100%);
@@ -33,8 +39,10 @@
     transition-delay: 0s;
   }
 
-  .hidden {
-    opacity: 0.6;
+  .gui-autohide.gui-autohide--timeout .gui,
+  .gui-autohide.in-game-menu-focus .gui,
+  .gui-hidden .gui {
+    opacity: .6;
   }
 }
 

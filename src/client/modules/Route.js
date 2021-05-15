@@ -5,8 +5,9 @@ export default class {
   el;
   routeEl;
   systemList;
-  lastSystem;
+  currentSystemName;
   centerViewTimeout;
+  onArrival;
 
   constructor(parentEl) {
     this.el = createElement(parentEl);
@@ -14,21 +15,24 @@ export default class {
 
     this.routeEl = createElement(this.el, 'ul');
     this.systemList = {};
-    this.lastSystem;
+    this.steps;
+    this.currentSystemName;
   }
 
   setSteps(steps) {
     this.routeEl.innerHTML = '';
     this.systemList = {};
+    this.steps = steps;
 
     steps.forEach((step, index) => {
       const system = new System(this.routeEl, step.StarSystem, step.StarClass);
 
       this.systemList[step.StarSystem] = system;
 
-      if (this.lastSystem == step.StarSystem) {
+      if (this.currentSystemName == step.StarSystem) {
         system.el.classList.add('current');
         this.centerView();
+        this.checkArrival();
       }
     });
   }
@@ -36,33 +40,50 @@ export default class {
   setCurrentSystem(systemName) {
     if (systemName && this.systemList[systemName]) {
       const system = this.systemList[systemName];
-  
+
       system.el.classList.remove('jumping');
       system.el.classList.add('current');
       this.centerView();
+      this.checkArrival();
     }
-  
-    this.lastSystem = systemName;
+
+    this.currentSystemName = systemName;
+  }
+
+  getRemainingJump() {
+    return this.steps.length -1 - this.steps.findIndex(step => step.StarSystem === this.currentSystemName);
+  }
+
+  checkArrival() {
+    if (this.isArrival()) {
+      if (typeof this.onArrival === 'function') {
+        this.onArrival(this.currentSystemName);
+      }
+    }
+  }
+
+  isArrival() {
+    return this.getRemainingJump() === 0;
   }
 
   jump(systemName) {
-    if (this.lastSystem && this.systemList[this.lastSystem]) {
-      this.systemList[this.lastSystem].el.classList.remove('current')
+    if (this.currentSystemName && this.systemList[this.currentSystemName]) {
+      this.systemList[this.currentSystemName].el.classList.remove('current')
     }
 
     if (systemName && this.systemList[systemName]) {
       this.systemList[systemName].el.classList.add('jumping');
-      this.lastSystem = systemName; 
+      this.currentSystemName = systemName;
       this.centerView();
     }
   }
 
   centerView(delay = 0) {
     clearTimeout(this.centerViewTimeout);
-    
+
     this.centerViewTimeout = setTimeout(() => {
-      if (this.lastSystem && this.systemList[this.lastSystem]) {
-        const currentSystemElementPosition = this.systemList[this.lastSystem].getDomElementPosition();
+      if (this.currentSystemName && this.systemList[this.currentSystemName]) {
+        const currentSystemElementPosition = this.systemList[this.currentSystemName].getDomElementPosition();
         const newScrollPosition = currentSystemElementPosition - (this.el.offsetWidth / 2);
         this.el.scrollTo({left: newScrollPosition, behavior: "smooth"});
       }

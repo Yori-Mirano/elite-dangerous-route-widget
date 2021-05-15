@@ -41,7 +41,3 @@ body::before {
   transition: opacity 0s;
   transition-delay: .5s;
 }
-
-.hidden {
-  opacity: 0;
-}

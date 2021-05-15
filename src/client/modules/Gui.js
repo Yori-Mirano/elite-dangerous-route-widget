@@ -2,10 +2,8 @@ export default class {
   config = {};
   notificationTimeout;
   notificationThrottle = 250;
-  inGameMenuFocus = false;
+  autohideTimeout;
   onChange;
-  onShow;
-  onHide;
 
   constructor(config = {}) {
     this.setState(config);
@@ -21,8 +19,6 @@ export default class {
     typeof config.themeColor !== 'undefined' && this.setColor(config.themeColor);
     typeof config.shadow !== 'undefined'     && this.setShadow(config.shadow);
     typeof config.fullColor !== 'undefined'  && this.setFullColor(config.fullColor);
-
-    this.updateAutohide();
   }
 
   notifyChanges() {
@@ -32,7 +28,6 @@ export default class {
       if (typeof this.onChange === 'function') {
         this.onChange(this.config);
       }
-      this.updateAutohide();
     }, this.notificationThrottle);
   }
 
@@ -58,6 +53,9 @@ export default class {
   }
 
   setAutohide(autohide) {
+    document.documentElement.classList.toggle('gui-autohide', autohide);
+    document.getElementById('config-panel__autohide').checked = autohide;
+
     if (this.config.autohide !== autohide) {
       this.config.autohide = autohide;
       this.notifyChanges();
@@ -65,6 +63,9 @@ export default class {
   }
 
   setHide(hide) {
+    document.documentElement.classList.toggle('gui-hidden', hide);
+    document.getElementById('config-panel__hide').checked = hide;
+
     if (this.config.hide !== hide) {
       this.config.hide = hide;
       this.notifyChanges();
@@ -83,7 +84,7 @@ export default class {
 
   setShadow(isShadowOn) {
     document.documentElement.style.setProperty('--color-background', isShadowOn ? '#000C' : 'transparent');
-    document.getElementById('config-panel__shadow').checked = isShadowOn;  
+    document.getElementById('config-panel__shadow').checked = isShadowOn;
 
     if (this.config.shadow !== isShadowOn) {
       this.config.shadow = isShadowOn;
@@ -94,7 +95,7 @@ export default class {
   setFullColor(isFullColored) {
     document.documentElement.style.setProperty('--color-off', isFullColored ? 'var(--color-theme)' : 'var(--color-on)');
     document.documentElement.style.setProperty('--color-off-alpha', isFullColored ? '.5' : '.4');
-    document.getElementById('config-panel__full-color').checked = isFullColored;  
+    document.getElementById('config-panel__full-color').checked = isFullColored;
 
     if (this.config.fullColor !== isFullColored) {
       this.config.fullColor = isFullColored;
@@ -102,35 +103,13 @@ export default class {
     }
   }
 
-  updateAutohide(inGameMenuFocus = null) {
-    if (inGameMenuFocus) {
-      this.inGameMenuFocus = inGameMenuFocus;
-    }
-
-    if (this.config.hide) {
-      this.hide();
-    } else {
-      if (this.config.autohide) {
-        if (this.inGameMenuFocus) {
-          this.hide();
-        } else {
-          this.show();
-        }
-      } else {
-        this.show();
-      }
-    }
+  resetAutohideTimeout(delay) {
+    this.clearAutohideTimeout();
+    this.autohideTimeout = setTimeout(() => document.documentElement.classList.add('gui-autohide--timeout'), delay * 1000);
   }
 
-  show() {
-    if (typeof this.onShow === 'function') {
-      this.onShow(this.steps);
-    }
-  }
-
-  hide() {
-    if (typeof this.onHide === 'function') {
-      this.onHide(this.steps);
-    }
+  clearAutohideTimeout() {
+    clearTimeout(this.autohideTimeout);
+    document.documentElement.classList.remove('gui-autohide--timeout');
   }
 }
