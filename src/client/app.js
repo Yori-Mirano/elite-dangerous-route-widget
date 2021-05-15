@@ -55,13 +55,13 @@ socket.on('stats', stats => {
 socket.on('route', steps => {
   //console.log('route:', steps);
   route.setSteps(steps);
-  gui.resetAutohideTimeout(info.secondsPerJump * 2);
+  gui.resetAutohideTimeout();
 });
 
 socket.on('system', systemName => {
   //console.log('system:', systemName);
   route.setCurrentSystem(systemName);
-  gui.resetAutohideTimeout(info.secondsPerJump * 2);
+  gui.resetAutohideTimeout();
 });
 
 socket.on('jumping', systemName => {

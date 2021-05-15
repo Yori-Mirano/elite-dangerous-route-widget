@@ -103,9 +103,9 @@ export default class {
     }
   }
 
-  resetAutohideTimeout(delay) {
+  resetAutohideTimeout() {
     this.clearAutohideTimeout();
-    this.autohideTimeout = setTimeout(() => document.documentElement.classList.add('gui-autohide--timeout'), delay * 1000);
+    this.autohideTimeout = setTimeout(() => document.documentElement.classList.add('gui-autohide--timeout'), this.config.autohideDelay * 1000);
   }
 
   clearAutohideTimeout() {

@@ -1,13 +1,14 @@
 server:
-  eliteLogDir:     '%userprofile%/Saved Games/Frontier Developments/Elite Dangerous'
+  eliteLogDir:      '%userprofile%/Saved Games/Frontier Developments/Elite Dangerous'
   stats:
-    historyLimit:  20
-    durationLimit: 300
+    historyLimit:   20
+    durationLimit:  300
 
 client:
-  guiScale:     1.0
-  themeColor:   '#ff7b00' # orange: #ff7b00 / blue: #02a5ec / emerald: #00ffaa
-  compact:      true
-  autohide:     false
-  fullColor:    false
-  shadow:       true
+  guiScale:         1.0
+  themeColor:       '#ff7b00' # orange: #ff7b00 / blue: #02a5ec / emerald: #00ffaa
+  compact:          true
+  autohide:         false
+  fullColor:        false
+  shadow:           true
+  autohideDelay:    300
