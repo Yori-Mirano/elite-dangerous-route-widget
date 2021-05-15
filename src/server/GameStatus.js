@@ -25,10 +25,14 @@ module.exports = class Status {
   }
 
   updateFromFile() {
-    this.status = JSON.parse(fs.readFileSync(this.filename));
-    //console.log(new Date(), 'status:', this.status);
+    try {
+      this.status = JSON.parse(fs.readFileSync(this.filename));
+      //console.log(new Date(), 'status:', this.status);
+      this.update();
 
-    this.update();
+    } catch(e) {
+      // do nothing
+    }
   }
 
   update() {
