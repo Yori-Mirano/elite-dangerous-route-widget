@@ -1,4 +1,3 @@
-
 # Elite Dangerous Route Widget (EDRW)
 A widget intended to be displayed on a stream via a browser source which shows the position on the current route.
 

@@ -1,6 +1,6 @@
 {
   "name": "elite-dangerous-route-widget",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.0",
   "description": "A widget intended to be displayed on a stream via a browser source which shows the position on the current route.",
   "main": "./server/server.js",
   "engines": {
@@ -12,7 +12,8 @@
   },
   "scripts": {
     "start": "node ./server/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node ./tools/build.js"
   },
   "author": "Yori Mirano <yori.mirano@gmail.com>",
   "license": "ISC",
@@ -22,5 +23,8 @@
     "line-reader": "^0.4.0",
     "socket.io": "^4.0.1",
     "yaml": "^1.10.2"
+  },
+  "devDependencies": {
+    "fs-extra": "^10.0.0"
   }
 }
