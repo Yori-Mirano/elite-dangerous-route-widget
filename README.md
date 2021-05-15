@@ -35,4 +35,4 @@ Check if the directory path of your E:D logs are correct in the `config.json` fi
 npm start
 ```
 
-Open `http://localhost:3000` in a browser or as source in OBS or equivalent.
+Open http://localhost:3000 in a browser or as source in OBS or equivalent.

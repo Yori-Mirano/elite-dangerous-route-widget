@@ -11,12 +11,12 @@ module.exports = class Status {
 
   watchFile() {
     this.updateFromFile();
-  
-    let watchTimeout; 
-  
+
+    let watchTimeout;
+
     fs.watch(this.filename, () => {
       if (watchTimeout) { clearTimeout(watchTimeout); } // prevent duplicated watch notifications
-      
+
       watchTimeout = setTimeout(() => {
         //console.log(new Date(), 'watchStatus: change detected');
         this.updateFromFile();
@@ -27,10 +27,10 @@ module.exports = class Status {
   updateFromFile() {
     this.status = JSON.parse(fs.readFileSync(this.filename));
     //console.log(new Date(), 'status:', this.status);
-  
+
     this.update();
   }
-  
+
   update() {
     if (typeof this.onChange === 'function') {
       this.onChange(this.status);
