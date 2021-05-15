@@ -32,6 +32,10 @@
     opacity: 1;
     transition-delay: 0s;
   }
+
+  .hidden {
+    opacity: 0.6;
+  }
 }
 
 @media (orientation: portrait) and (min-height: 401px) {

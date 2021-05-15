@@ -22,20 +22,18 @@ gui.onChange = config => {
 };
 
 gui.onShow = () => {
-  route.el.style.opacity = 1;
-  info.el.style.opacity = 1;
+  [route.el, info.el].forEach(el => el.classList.remove('hidden'));
 };
 
 gui.onHide = () => {
-  route.el.style.opacity = 0;
-  info.el.style.opacity = 0;
+  [route.el, info.el].forEach(el => el.classList.add('hidden'));
 };
 
 
 /*
  * Socket
  */
-socket.on('connect',function(){ 
+socket.on('connect',function(){
   socket.emit('clientInfo', {
     origin: window.location.origin,
     platform: navigator.platform
