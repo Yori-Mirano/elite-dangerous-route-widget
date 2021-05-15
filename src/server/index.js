@@ -18,8 +18,8 @@ const utils       = require('./utils');
  */
 const paths = {
   configSample: __dirname + '/../config.sample.yml',
-  config:       __dirname + '/../config.yml',
-  stats:        __dirname + '/../stats.json',
+  config:       __dirname + '/../../config.yml',
+  stats:        __dirname + '/../../stats.json',
   client:       __dirname + '/../client',
 }
 
@@ -114,7 +114,7 @@ io.on('connection', (socket) => {
   socket.emit('config', config.client);
   socket.emit('stats', stats.get());
   if (route.steps)            { socket.emit('route', route.steps); }
-  if (gameLog.currentSystem)  { socket.emit('system', gameLog.currentSystem); }  
+  if (gameLog.currentSystem)  { socket.emit('system', gameLog.currentSystem); }
   if (gameStatus.status)      { socket.emit('status', gameStatus.status); }
 
   socket.on('config', clientConfig => {
