@@ -1,5 +1,5 @@
 server:
-  eliteLogDir:      '%userprofile%/Saved Games/Frontier Developments/Elite Dangerous'
+  eliteLogDir:      tests/tmp
   openBrowser:      true
   stats:
     historyLimit:   20

@@ -1,0 +1,9 @@
+{
+  "Route": [
+    { "StarSystem": "Scoopable",    "StarPos": [0, 0, 0],   "StarClass": "O" },
+    { "StarSystem": "No scoopable", "StarPos": [50, 0, 0],  "StarClass": "P" },
+    { "StarSystem": "White dwarf",  "StarPos": [100, 0, 0], "StarClass": "D" },
+    { "StarSystem": "Neutron",      "StarPos": [150, 0, 0], "StarClass": "N" },
+    { "StarSystem": "Black hole",   "StarPos": [200, 0, 0], "StarClass": "H" }
+  ]
+}

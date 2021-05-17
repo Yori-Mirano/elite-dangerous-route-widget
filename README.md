@@ -49,9 +49,6 @@ You can download the lastest release from [the releases page](https://github.com
 
 There is only package for Windows at the moment. For Mac OS and Linux distribs, you can use source from [this repo](https://github.com/Yori-Mirano/elite-dangerous-route-widget) and follow the instructions in the "Download > From source" section of this README.
 
-#### How to launch
-Unzip de package where you want, and execute the file `elite-dangerous-route-widget.bat`.
-
 
 ### From source
 
@@ -60,7 +57,6 @@ Make sure you have installed all of the following prerequisites on your machine:
 
 - [node.js (v12)](https://nodejs.org/dist/latest-v12.x/) - Download & Install Node.js and the npm package manager.
 
-
 #### Installation 
 In a terminal, at the root of the sources folder, type the following command:
 
@@ -68,17 +64,27 @@ In a terminal, at the root of the sources folder, type the following command:
 npm install
 ```
 
-#### How to launch
+## How to use
+### Launch the app
+#### From source
+Unzip the package where you want, and execute the file `elite-dangerous-route-widget.bat`.
+
+#### From source
 In a terminal, at the root of the sources folder, type the following command:
 
 ```bash
 npm start
 ```
 
-## How to use
-Once the app is launched (refer to "Download > How to launch" section), you can then open http://localhost:3000 in a browser or as source in OBS or equivalent **to access the route widget**.
+### Open the widget
+When launching the application, the widget automatically opens in a new tab in your default browser.
+
+NOTE: You can disable this automatic opening by setting the value of `server.openBrowser` to `false` in the` config.yml` file.
+
+Otherwise, when the application is already launched, to manually open the widget, just open http://localhost:3000 in a browser or as source in OBS or equivalent **to access the route widget**.
 
 You can also access the widget from another device on the local network via the IP of the machine running the app.
+
 
 ### Add to your overlay in OBS (or equivalent)
 For the controls are not displayed, it is necessary that the height of view is less than **400px**.
@@ -96,9 +102,11 @@ transform: skewY(-6deg);
 
 
 ### Configuration and controls
+#### Via the config file
 A configuration `config.yml` file is automatically generated when the program is run for the first time. You will have to relaunch it for your changes to take effect (to return to the default configuration, all you have to do is delete the file so that a new one is generated).
 
-Otherwise, most of the parameters related to the display are directly configurable via the widget. To display them, it is enough that the view is greater than **400px height**.
+#### Via the GUI
+Otherwise, most of the parameters related to the display are directly configurable via the widget. **To display them, it is enough that the view is greater than 400px height**.
 
 The settings are synchronized between each instance of the widget. You can thus control the appearance of the widget inserted in OBS via the browser of your PC or another device on the same local network.
 

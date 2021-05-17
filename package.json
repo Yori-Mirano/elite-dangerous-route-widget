@@ -12,6 +12,7 @@
   },
   "scripts": {
     "start": "node ./src/server",
+    "test": "node ./tests",
     "build": "node ./tools/build.js"
   },
   "author": "Yori Mirano <yori.mirano@gmail.com>",
@@ -21,7 +22,8 @@
     "glob": "^7.1.6",
     "line-reader": "^0.4.0",
     "socket.io": "^4.0.1",
-    "yaml": "^1.10.2"
+    "yaml": "^1.10.2",
+    "open": "^8.0.9"
   },
   "devDependencies": {
     "fs-extra": "^10.0.0",

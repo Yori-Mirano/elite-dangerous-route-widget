@@ -5,6 +5,7 @@ const app         = express();
 const server      = require('http').createServer(app);
 const { Server }  = require('socket.io');
 const io          = new Server(server);
+const open        = require('open');
 
 const Stats       = require('./Stats');
 const Route       = require('./Route');
@@ -12,15 +13,16 @@ const GameLog     = require('./GameLog');
 const GameStatus  = require('./GameStatus');
 const utils       = require('./utils');
 
+const customConfigPath = process.argv[2];
 
 /*
  * Paths
  */
 const paths = {
-  configSample: __dirname + '/../config.sample.yml',
-  config:       __dirname + '/../../config.yml',
-  stats:        __dirname + '/../../stats.json',
-  client:       __dirname + '/../client',
+  configSample: `${__dirname}/../config.sample.yml`,
+  config:       customConfigPath ? customConfigPath : `${__dirname}/../../config.yml`,
+  stats:        `${__dirname}/../../stats.json`,
+  client:       `${__dirname}/../client`,
 }
 
 if (!fs.existsSync(paths.config)) {
@@ -137,7 +139,15 @@ app.use(express.static(paths.client));
 
 server.listen(3000, () => {
   console.log(new Date(), 'server: listening on *:3000');
-  console.log('\n    Go to   http://localhost:3000   to open the widget on this device\n');
-});
+  console.log(  '\n    Go to   http://localhost:3000      to open the widget on this device,');
 
-utils.getLocalIp().then(localIp => console.log(`    Or to   http://${localIp}:3000   to open the widget from another device on the local network\n`));
+  utils.getLocalIp().then(localIp => {
+    console.log(  `    or to   http://${localIp}:3000   to open the widget from another device on the local network\n`)
+
+    if (config.server.openBrowser) {
+      open('http://localhost:3000');
+      console.log('    NOTE:   To disable the automatic opening of the browser, set the value\n' +
+                  '            `server.openBrowser` to `false` in the `config.yml` file\n');
+    }
+  });
+});

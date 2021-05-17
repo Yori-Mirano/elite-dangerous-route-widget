@@ -1,5 +1,5 @@
 const fs          = require('fs');
-const glob        = require('glob')
+const glob        = require('glob');
 const lineReader  = require('line-reader');
 
 module.exports = class GameLog {
