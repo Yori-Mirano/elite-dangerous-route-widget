@@ -45,7 +45,7 @@ li::after {
   border-radius: 50%;
   color: var(--color);
   border: .2rem solid;
-  transition-property: color, background-color, opacity;
+  transition-property: color, background-color, box-shadow, opacity;
   transition-duration: .5s;
 }
 
@@ -80,7 +80,10 @@ li.black-hole::after {
   border: none;
   width: 1.6rem;
   height: 1.6rem;
-  background-image: radial-gradient(transparent 0%, var(--color) 32%, transparent 45%, transparent 50%, var(--color) 60%);
+  background-color: var(--color);
+  background-clip: content-box;
+  border: .3rem solid transparent;
+  box-shadow: 0 0 0 .1rem var(--color);
 }
 
 li + li::before {
