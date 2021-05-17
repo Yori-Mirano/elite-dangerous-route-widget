@@ -88,6 +88,7 @@
 * Input checkbox
 */
 [type=checkbox] {
+  -webkit-appearance: none;
   appearance: none;
   width: 24px;
   height: 24px;
