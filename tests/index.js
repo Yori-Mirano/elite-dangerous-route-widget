@@ -1,5 +1,5 @@
 const fs            = require('fs');
-const { exec }      = require('child_process');
+const { spawn }     = require('child_process');
 const lineReader    = require('line-reader');
 const fixtureDir    = __dirname + '/fixtures';
 const testDir       = __dirname + '/tmp';
@@ -20,12 +20,23 @@ function initFixtures() {
 }
 
 function clearFixtures() {
-  fs.rmdirSync(testDir, {recursive: true});
+  fixtureFiles.forEach(filename => fs.unlinkSync(testDir + filename));
+  fs.rmdirSync(testDir);
 }
 
 
 initFixtures();
-exec('node ./src/server/ ./tests/tmp/config.yml ', {cwd: __dirname + '/..'});
+
+const childProcess = spawn(
+  'node',
+  ['./src/server/', './tests/tmp/config.yml'],
+  {cwd: __dirname + '/..'}
+);
+
+childProcess.stderr.on('data', (data) => {
+  console.error(`stderr: ${data}`);
+});
+
 
 let lineIndex = 0;
 
@@ -33,12 +44,15 @@ lineReader.eachLine(fixtureDir + '/test.log', (line, last) => {
   lineIndex++;
 
   setTimeout(() => {
-    console.log(line);
+    console.log('test:',line);
 
     fs.appendFileSync(testDir + '/test.log', line + '\n');
 
     if (last) {
-      setTimeout(() => clearFixtures(), 1000);
+      setTimeout(() => {
+        childProcess.kill();
+        clearFixtures()
+      }, 1000);
     }
   }, lineIndex * 1000);
 });

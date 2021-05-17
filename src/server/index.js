@@ -71,9 +71,12 @@ gameLog.onShipChange = ship => {
 }
 
 gameLog.onJump = nextSystemName => {
-  stats.jump(route.getStepByName(nextSystemName).StarPos);
-  stats.setRemainingJump(route.getRemainingJump(nextSystemName));
-  stats.update();
+  const system = route.getStepByName(nextSystemName);
+  if (system) {
+    stats.jump(system.StarPos);
+    stats.setRemainingJump(route.getRemainingJump(nextSystemName));
+    stats.update();
+  }
   io.emit('jumping', nextSystemName);
 }
 
