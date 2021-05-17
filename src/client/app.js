@@ -74,5 +74,5 @@ socket.on('jumping', systemName => {
 socket.on('status', status => {
   //console.log('status:', status);
   const inGameMenuFocus = typeof status.GuiFocus === 'undefined' || status.GuiFocus !== 0;
-  document.documentElement.classList.toggle('in-game-menu-focus', inGameMenuFocus);
+  document.documentElement.classList.toggle('in-game-menu-focus', gui.config.autohide.onInGameMenu && inGameMenuFocus);
 });

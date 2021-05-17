@@ -13,7 +13,7 @@ export default class {
     this.config = config;
 
     typeof config.guiScale !== 'undefined'   && this.setScale(config.guiScale);
-    typeof config.autohide !== 'undefined'   && this.setAutohide(config.autohide);
+    typeof config.autohide !== 'undefined'   && this.setAutohide(config.autohide.enabled);
     typeof config.hide !== 'undefined'       && this.setHide(config.hide);
     typeof config.compact !== 'undefined'    && this.setCompact(config.compact);
     typeof config.themeColor !== 'undefined' && this.setColor(config.themeColor);
@@ -56,8 +56,8 @@ export default class {
     document.documentElement.classList.toggle('gui-autohide', autohide);
     document.getElementById('config-panel__autohide').checked = autohide;
 
-    if (this.config.autohide !== autohide) {
-      this.config.autohide = autohide;
+    if (this.config.autohide.enabled !== autohide) {
+      this.config.autohide.enabled = autohide;
       this.notifyChanges();
     }
   }
@@ -105,7 +105,9 @@ export default class {
 
   resetAutohideTimeout() {
     this.clearAutohideTimeout();
-    this.autohideTimeout = setTimeout(() => document.documentElement.classList.add('gui-autohide--timeout'), this.config.autohideDelay * 1000);
+    if (this.config.autohide.delay) {
+      this.autohideTimeout = setTimeout(() => document.documentElement.classList.add('gui-autohide--timeout'), this.config.autohide.delay * 1000);
+    }
   }
 
   clearAutohideTimeout() {
