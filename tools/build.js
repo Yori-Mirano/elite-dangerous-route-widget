@@ -24,8 +24,11 @@ fse.emptyDirSync(destDir);
 sources.forEach(source => fse.copySync(sourceDir + source, destDir + source));
 fse.ensureDirSync(`${destDir}/bin`);
 download('https://nodejs.org/dist/latest-v12.x/win-x64/node.exe', `${destDir}/bin/node.exe`);
-fs.writeFileSync(`${destDir}/README.html`, md.render(fs.readFileSync(`${sourceDir}/README.md`, 'utf8')));
 fs.writeFileSync(`${destDir}/${name}.bat`, '.\\bin\\node.exe .\\src\\server\\index.js');
 execSync('npm ci', {cwd: destDir});
 fse.removeSync(`${destDir}/package-lock.json`);
 
+const readmeHtmlLayout = fs.readFileSync(`${sourceDir}/tools/doc-layout.html`, 'utf8');
+const readmeHtmlBody = md.render(fs.readFileSync(`${sourceDir}/README.md`, 'utf8'));
+const readmeHtml = readmeHtmlLayout.replace('<main></main>', `<main>${readmeHtmlBody}</main>`);
+fs.writeFileSync(`${destDir}/README.html`, readmeHtml);

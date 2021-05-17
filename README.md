@@ -8,18 +8,18 @@ This widget is above all designed to be opened as a browser source in streaming 
 ![](docs/gifs/example.gif)
 
 ## Features
-- Show your current position on the route in real time
-- Show name of each system on the route
-- Compact view for system with generic name (those that contain numbers)
-- Indicate if the primary star of each system is scoopable or not, a neutron or white dwarf
-- Displays the remaining time, distance, and jumps to the destination
-- Displays the average over the last 20 jumps (configurable) of the number of light years per hour, of jumps per hour, of light years per jump, and of seconds per jump.
-- Transparent background for integration with OBS or equivalent
-- It is possible to activate the automatic hiding of the widget when the view in the game is focused on a menu. It will also hide automatically after a certain time (5 min by default, configurable)
-- Customizable theme color
+- Show your **current position** on the route in **real time**
+- Show **name of each system** on the route
+- **Compact view** for system with generic name (those that contain numbers)
+- Indicate if the primary star of each system is **scoopable or not**, a **neutron** or **white dwarf**
+- Displays the **remaining time, distance, and jumps** to the destination
+- Displays the **average** over the last 20 jumps (configurable) of the **number of light years per hour**, of **jumps per hour**, of **light years per jump**, and of **seconds per jump**.
+- **Transparent background** for integration with OBS or equivalent
+- It is possible to activate the **automatic hiding** of the widget when the view in the game is focused on a menu. It will also hide automatically after a certain time (5 min by default, configurable)
+- **Customizable theme color**
 - Some customization options (shadow, alternative theme, GUI scale, compact view)
-- Synchronization of the customization options between all clients to control the appearance in OBS from another browser.
-- The options GUI is only displayed when the view is more than 400px height to prevent it from being displayed in OBS.
+- **Synchronization** of the customization options **between all clients** to control the appearance in OBS from another browser.
+- The **options GUI is only displayed when the view is more than 400px height** to prevent it from being displayed in OBS.
 
 ### Representation of the type of stars
 Five types of stars are represented:
@@ -81,7 +81,7 @@ Once the app is launched (refer to "Download > How to launch" section), you can 
 You can also access the widget from another device on the local network via the IP of the machine running the app.
 
 ### Add to your overlay in OBS (or equivalent)
-For the controls are not displayed, it is necessary that the height of view is less than 400px.
+For the controls are not displayed, it is necessary that the height of view is less than **400px**.
 
 ![Add a new browser source in OBS](docs/images/obs-settings.png)
 
@@ -98,7 +98,7 @@ transform: skewY(-6deg);
 ### Configuration and controls
 A configuration `config.yml` file is automatically generated when the program is run for the first time. You will have to relaunch it for your changes to take effect (to return to the default configuration, all you have to do is delete the file so that a new one is generated).
 
-Otherwise, most of the parameters related to the display are directly configurable via the widget. To display them, it is enough that the view is greater than 400px.
+Otherwise, most of the parameters related to the display are directly configurable via the widget. To display them, it is enough that the view is greater than **400px height**.
 
 The settings are synchronized between each instance of the widget. You can thus control the appearance of the widget inserted in OBS via the browser of your PC or another device on the same local network.
 
