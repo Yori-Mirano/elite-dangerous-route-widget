@@ -124,7 +124,7 @@ li.jumping::before {
   animation: pulse infinite 3s linear;
   background-image: linear-gradient(to right, transparent, white, transparent);
   background-color: transparent;
-  background-size: 20%;
+  background-size: 20% 100%;
 }
 
 li.jumping > span {
