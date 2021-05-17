@@ -74,7 +74,7 @@ export default class {
     if (systemName && this.systemList[systemName]) {
       this.systemList[systemName].el.classList.add('jumping');
       this.currentSystemName = systemName;
-      this.centerView();
+      this.centerView(550);
     }
   }
 
