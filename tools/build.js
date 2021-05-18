@@ -23,7 +23,7 @@ function download(url, dest) {
 fse.emptyDirSync(destDir);
 sources.forEach(source => fse.copySync(sourceDir + source, destDir + source));
 fse.ensureDirSync(`${destDir}/bin`);
-download('https://nodejs.org/dist/latest-v12.x/win-x64/node.exe', `${destDir}/bin/node.exe`);
+download('https://nodejs.org/dist/latest-v14.x/win-x64/node.exe', `${destDir}/bin/node.exe`);
 fs.writeFileSync(`${destDir}/${name}.bat`, '.\\bin\\node.exe .\\src\\server\\index.js');
 execSync('npm ci', {cwd: destDir});
 fse.removeSync(`${destDir}/package-lock.json`);

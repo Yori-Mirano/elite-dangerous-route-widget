@@ -4,7 +4,7 @@
   "description": "A widget intended to be displayed on a stream via a browser source which shows the position on the current route.",
   "main": "./src/server/index.js",
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=14.0.0"
   },
   "repository": {
     "type": "git",
