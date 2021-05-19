@@ -1,10 +1,10 @@
 { "event": "Loadout",     "ShipID": "1", "Ship": "Ship Model", "ShipName": "Ship name", "ShipIdent": "Ship ident", "MaxJumpRange": "50" }
-{ "event": "Location",    "StarSystem": "Scoopable" }
+{ "event": "Location",    "StarSystem": "Scoopable",      "StarPos": [0, 0, 0] }
 { "event": "StartJump",   "StarSystem": "No scoopable",   "JumpType": "Hyperspace" }
-{ "event": "FSDJump",     "StarSystem": "No scoopable" }
+{ "event": "FSDJump",     "StarSystem": "No scoopable",   "StarPos": [500, 0, 0] }
 { "event": "StartJump",   "StarSystem": "White dwarf",    "JumpType": "Hyperspace" }
-{ "event": "FSDJump",     "StarSystem": "White dwarf" }
+{ "event": "FSDJump",     "StarSystem": "White dwarf",    "StarPos": [1000, 0, 0] }
 { "event": "StartJump",   "StarSystem": "Neutron",        "JumpType": "Hyperspace" }
-{ "event": "FSDJump",     "StarSystem": "Neutron" }
+{ "event": "FSDJump",     "StarSystem": "Neutron",        "StarPos": [1000, 500, 0] }
 { "event": "StartJump",   "StarSystem": "Black hole",     "JumpType": "Hyperspace" }
-{ "event": "FSDJump",     "StarSystem": "Black hole" }
+{ "event": "FSDJump",     "StarSystem": "Black hole",     "StarPos": [1000, 1000, 0] }

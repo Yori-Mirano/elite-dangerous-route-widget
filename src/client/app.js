@@ -7,6 +7,7 @@ const socket  = io();
 const route   = new Route();
 const info    = new Info(createElement());
 const gui     = new Gui();
+let config;
 window.route  = route;
 window.gui    = gui;
 
@@ -17,8 +18,9 @@ window.addEventListener('resize', () => route.centerView() );
 /*
  * GUI
  */
-gui.onChange = config => {
+gui.onChange = clientConfig => {
   //console.log('config: emit');
+  config.client = clientConfig;
   socket.emit('config', config);
 };
 
@@ -41,9 +43,10 @@ socket.on('connect',function(){
   });
 });
 
-socket.on('config', config => {
+socket.on('config', configFromServer => {
   //console.log('config: receive');
-  gui.setState(config);
+  config = configFromServer;
+  gui.setState(config.client);
   route.centerView(550);
 });
 
@@ -69,6 +72,14 @@ socket.on('jumping', systemName => {
   route.jump(systemName);
   document.documentElement.classList.remove('timeout');
   gui.clearAutohideTimeout();
+});
+
+socket.on('expedition:waypoints', waypoints => {
+  console.log('expedition:waypoints', waypoints);
+});
+
+socket.on('expedition:progression', progression => {
+  console.log('expedition:progression', progression);
 });
 
 socket.on('status', status => {

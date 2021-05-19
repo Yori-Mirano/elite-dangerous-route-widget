@@ -1,6 +1,7 @@
 const fs          = require('fs');
 const glob        = require('glob');
 const lineReader  = require('line-reader');
+const StarSystem  = require('./StarSystem');
 
 module.exports = class GameLog {
   eliteLogDir;
@@ -76,7 +77,7 @@ module.exports = class GameLog {
         case 'StartJump':
           if (log.JumpType === "Hyperspace") {
             this._isJumping = true;
-            nextSystem = log.StarSystem;
+            nextSystem = new StarSystem(log.StarSystem);
           }
           break;
 
@@ -84,7 +85,7 @@ module.exports = class GameLog {
         case 'FSDJump':
         case 'CarrierJump':
           this._isJumping = false;
-          this.currentSystem = log.StarSystem;
+          this.currentSystem = new StarSystem(log.StarSystem, log.StarPos);
           break;
 
         case 'Shutdown':
@@ -107,7 +108,7 @@ module.exports = class GameLog {
         }
 
         if (this._isJumping) {
-          if (nextSystem && nextSystem !== this._lastJumpSystem) {
+          if (nextSystem && !this._lastJumpSystem || (this._lastJumpSystem && this._lastJumpSystem.name && nextSystem.name !== this._lastJumpSystem.name)) {
             //console.log(new Date(), 'jumping: ', nextSystem);
             this._lastJumpSystem = nextSystem;
 
@@ -116,7 +117,7 @@ module.exports = class GameLog {
             }
           }
 
-        } else if (this.currentSystem && this.currentSystem !== this._lastSystem) {
+        } else if (this.currentSystem && !this._lastSystem || (this._lastSystem && this.currentSystem.name !== this._lastSystem.name)) {
           //console.log(new Date(), 'system:', this.currentSystem);
           this._lastSystem = this.currentSystem;
 

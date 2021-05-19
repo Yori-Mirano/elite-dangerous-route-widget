@@ -1,3 +1,8 @@
+const http  = require ('http');
+const https = require ('https');
+const os    = require('os');
+const { execSync } = require('child_process');
+
 exports.getDistance = (positionA, positionB) => {
   return Math.sqrt(
     Math.pow(positionA[0] - positionB[0], 2)
@@ -13,4 +18,39 @@ exports.getLocalIp = () => {
       resolve(add);
     });
   });
+}
+
+
+exports.fetch = (url) => {
+  return new Promise((resolve, reject) => {
+    const protocol = /^https/.test(url) ? https : http;
+    const request = protocol.get(url, res => {
+      let data = '';
+
+      res.on('data', function (chunk) {
+        data += chunk;
+      });
+
+      res.on('end', function () {
+        resolve({
+          headers:  res.headers,
+          data:     data
+        });
+      });
+    });
+
+    request.on('error', function (e) {
+      reject(e.message);
+    });
+
+    request.end();
+  });
+}
+
+exports.kill = (process) => {
+  if (os.platform() === 'win32') { // process.platform was undefined for me, but this works
+    execSync(`taskkill /F /T /PID ${process.pid}`); // windows specific
+  } else {
+    process.kill();
+  }
 }

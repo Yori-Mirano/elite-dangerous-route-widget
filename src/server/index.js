@@ -11,9 +11,12 @@ const Stats       = require('./Stats');
 const Route       = require('./Route');
 const GameLog     = require('./GameLog');
 const GameStatus  = require('./GameStatus');
+const EdsmExpedition = require('./EdsmExpedition');
 const utils       = require('./utils');
 
 const customConfigPath = process.argv[2];
+
+let edsmExpedition;
 
 /*
  * Paths
@@ -29,7 +32,7 @@ if (!fs.existsSync(paths.config)) {
   fs.copyFileSync(paths.configSample, paths.config, fs.constants.COPYFILE_EXCL);
 }
 
-const config      = YAML.parse(fs.readFileSync(paths.config, 'utf8'));
+let config        = YAML.parse(fs.readFileSync(paths.config, 'utf8'));
 const homedir     = require('os').homedir();
 
 paths.eliteLogDir = config.server.eliteLogDir.replace('%userprofile%', homedir);
@@ -70,24 +73,28 @@ gameLog.onShipChange = ship => {
   stats.update();
 }
 
-gameLog.onJump = nextSystemName => {
-  const system = route.getStepByName(nextSystemName);
-  if (system) {
-    stats.jump(system.StarPos);
-    stats.setRemainingJump(route.getRemainingJump(nextSystemName));
+gameLog.onJump = nextSystem => {
+  const step = route.getStepByName(nextSystem.name);
+  if (step) {
+    stats.jump(step.StarPos);
+    stats.setRemainingJump(route.getRemainingJump(nextSystem.name));
     stats.update();
   }
-  io.emit('jumping', nextSystemName);
+  io.emit('jumping', nextSystem.name);
 }
 
-gameLog.onLocate = systemName => {
-  const system = route.getStepByName(systemName);
-  if (system) {
-    stats.setPosition(system.StarPos);
-    stats.setRemainingJump(route.getRemainingJump(systemName));
+gameLog.onLocate = system => {
+  const step = route.getStepByName(system.name);
+  if (step) {
+    stats.setPosition(step.StarPos);
+    stats.setRemainingJump(route.getRemainingJump(system.name));
     stats.update();
   }
-  io.emit('system', systemName);
+  io.emit('system', system.name);
+
+  if (edsmExpedition && edsmExpedition.isFetched) {
+    io.emit('expedition:progression', edsmExpedition.getProgression(system.position));
+  }
 }
 
 gameLog.watchLog();
@@ -105,6 +112,23 @@ gameStatus.onChange = gameStatus => {
 gameStatus.watchFile();
 
 
+
+/*
+ * EdsmExpedition
+ */
+if (config.server.edsmExpeditionUrl) {
+  edsmExpedition = new EdsmExpedition(config.server.edsmExpeditionUrl);
+  edsmExpedition.fetchWaypoints().then(waypoints => {
+    io.emit('expedition:waypoints', waypoints);
+
+    if (gameLog.currentSystem) {
+      io.emit('expedition:progression', edsmExpedition.getProgression(gameLog.currentSystem.position));
+    }
+  });
+}
+
+
+
 /*
  * Socket
  */
@@ -116,16 +140,24 @@ io.on('connection', (socket) => {
     console.log(new Date(), 'socket: user connected from ', clientInfo.origin, '(', clientInfo.platform, ')');
   });
 
-  socket.emit('config', config.client);
+  socket.emit('config', config);
   socket.emit('stats', stats.get());
   if (route.steps)            { socket.emit('route', route.steps); }
-  if (gameLog.currentSystem)  { socket.emit('system', gameLog.currentSystem); }
+  if (gameLog.currentSystem)  { socket.emit('system', gameLog.currentSystem.name); }
   if (gameStatus.status)      { socket.emit('status', gameStatus.status); }
 
-  socket.on('config', clientConfig => {
+  if (edsmExpedition && edsmExpedition.waypoints) {
+    socket.emit('expedition:waypoints', edsmExpedition.waypoints);
+
+    if (gameLog.currentSystem) {
+      io.emit('expedition:progression', edsmExpedition.getProgression(gameLog.currentSystem.position));
+    }
+  }
+
+  socket.on('config', configFromClient => {
     //console.log(new Date(), 'config: receive');
-    config.client = clientConfig;
-    socket.broadcast.emit('config', clientConfig);
+    config = configFromClient;
+    socket.broadcast.emit('config', configFromClient);
     fs.writeFileSync(paths.config, YAML.stringify(config));
   });
 

@@ -1,0 +1,54 @@
+{
+  "systems": [
+    {
+      "name": "Premier point de passage",
+      "id": 11111,
+      "id64": 687058008289,
+      "coords": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "coordsLocked": true,
+      "primaryStar": {
+        "type": "M (Red dwarf) Star",
+        "name": "Blae Hypue VL-H b26-0",
+        "isScoopable": true
+      }
+    },
+
+    {
+      "name": "Deuxieme point de passage",
+      "id": 22222,
+      "id64": 687058008289,
+      "coords": {
+        "x": 1000,
+        "y": 0,
+        "z": 0
+      },
+      "coordsLocked": true,
+      "primaryStar": {
+        "type": "M (Red dwarf) Star",
+        "name": "Blae Hypue VL-H b26-0",
+        "isScoopable": true
+      }
+    },
+
+    {
+      "name": "Troisieme point de passage",
+      "id": 33333,
+      "id64": 687058008289,
+      "coords": {
+        "x": 1000,
+        "y": 1000,
+        "z": 0
+      },
+      "coordsLocked": true,
+      "primaryStar": {
+        "type": "M (Red dwarf) Star",
+        "name": "Blae Hypue VL-H b26-0",
+        "isScoopable": true
+      }
+    }
+  ]
+}

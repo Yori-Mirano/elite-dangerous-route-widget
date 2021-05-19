@@ -1,6 +1,7 @@
 const fs            = require('fs');
-const { spawn }     = require('child_process');
+const { spawn } = require('child_process');
 const lineReader    = require('line-reader');
+const { kill }      = require(__dirname + '/../src/server/utils');
 const fixtureDir    = __dirname + '/fixtures';
 const testDir       = __dirname + '/tmp';
 const fixtureFiles  = [
@@ -24,35 +25,48 @@ function clearFixtures() {
   fs.rmdirSync(testDir);
 }
 
-
-initFixtures();
-
-const childProcess = spawn(
-  'node',
-  ['./src/server/', './tests/tmp/config.yml'],
-  {cwd: __dirname + '/..'}
+const edsmMockchildProcess = spawn(
+  'npm',
+  ['run', 'edsmMock'],
+  { cwd: __dirname + '/..', shell: true }
 );
 
-childProcess.stderr.on('data', (data) => {
-  console.error(`stderr: ${data}`);
-});
+setTimeout(() => {
+  initFixtures();
+
+  const edrwChildProcess = spawn(
+    'npm',
+    ['run', 'start', './tests/tmp/config.yml'],
+    { cwd: __dirname + '/..', shell: true }
+  );
+
+  edrwChildProcess.stderr.on('data', (data) => {
+    console.error(`stderr: ${data}`);
+  });
 
 
-let lineIndex = 0;
+  edrwChildProcess.on('uncaughtException', (data) => {
+    console.error(`stderr: ${data}`);
+  });
 
-lineReader.eachLine(fixtureDir + '/test.log', (line, last) => {
-  lineIndex++;
 
-  setTimeout(() => {
-    console.log('test:',line);
+  let lineIndex = 0;
 
-    fs.appendFileSync(testDir + '/test.log', line + '\n');
+  lineReader.eachLine(fixtureDir + '/test.log', (line, last) => {
+    lineIndex++;
 
-    if (last) {
-      setTimeout(() => {
-        childProcess.kill();
-        clearFixtures()
-      }, 1000);
-    }
-  }, lineIndex * 1000);
-});
+    setTimeout(() => {
+      console.log('test:',line);
+
+      fs.appendFileSync(testDir + '/test.log', line + '\n');
+
+      if (last) {
+        setTimeout(() => {
+          kill(edrwChildProcess);
+          kill(edsmMockchildProcess);
+          clearFixtures()
+        }, 1000);
+      }
+    }, lineIndex * 1000);
+  });
+}, 1000);

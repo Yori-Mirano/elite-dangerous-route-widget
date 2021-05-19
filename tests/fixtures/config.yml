@@ -1,17 +1,18 @@
 server:
-  eliteLogDir:      tests/tmp
-  openBrowser:      true
+  eliteLogDir:        tests/tmp
+  openBrowser:        true
+  edsmExpeditionUrl:  http:/localhost:3030/expedition.html
   stats:
-    historyLimit:   20
-    durationLimit:  300
+    historyLimit:     20
+    durationLimit:    300
 
 client:
-  guiScale:         1.0
-  themeColor:       '#ff7b00' # orange: #ff7b00 / blue: #02a5ec / emerald: #00ffaa
-  compact:          true
-  fullColor:        false
-  shadow:           true
+  guiScale:           1.0
+  themeColor:         '#ff7b00' # orange: #ff7b00 / blue: #02a5ec / emerald: #00ffaa
+  compact:            true
+  fullColor:          false
+  shadow:             true
   autohide:
-    enabled:        false
-    delay:          300       # autohide timeout disabled if the value is 0 (zero)
-    onInGameMenu:   true
+    enabled:          false
+    delay:            300       # autohide timeout disabled if the value is 0 (zero)
+    onInGameMenu:     true
