@@ -27,6 +27,7 @@
     <link rel="stylesheet" type="text/css" href="styles/info.css"/>
     <link rel="stylesheet" type="text/css" href="styles/route.css"/>
     <link rel="stylesheet" type="text/css" href="styles/config-panel.css"/>
+    <link rel="stylesheet" type="text/css" href="styles/handles.css"/>
 
     <script src="/socket.io/socket.io.js"></script>
     <script type="module" src="app.js" defer></script>
@@ -73,6 +74,10 @@
         <input id="config-panel__theme-color" type="color" oninput="gui.setColor(this.value)"/>
         Color
       </label>
+    </div>
+
+    <div class="handles">
+      <div class="handle-move"></div>
     </div>
   </body>
 </html>

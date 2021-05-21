@@ -1,4 +1,5 @@
 import { createElement }  from './modules/utils.js';
+import handles from './modules/handles.js';
 import Info    from './modules/Info.js';
 import Gui     from './modules/Gui.js';
 import Route   from './modules/Route.js';
@@ -36,11 +37,20 @@ route.onArrival = systemName => {
 /*
  * Socket
  */
-socket.on('connect',function(){
+socket.on('connect', () => {
   socket.emit('clientInfo', {
     origin: window.location.origin,
     platform: navigator.platform
   });
+});
+
+handles.unlock();
+socket.on('unlock', () => {
+  handles.unlock();
+});
+
+socket.on('lock', () => {
+  handles.lock();
 });
 
 socket.on('config', configFromServer => {

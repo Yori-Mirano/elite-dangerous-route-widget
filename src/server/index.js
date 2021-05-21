@@ -1,8 +1,9 @@
 const fs          = require('fs');
 const YAML        = require('yaml')
+var path          = require("path")
 const express     = require('express');
-const app         = express();
-const server      = require('http').createServer(app);
+const expressApp  = express();
+const server      = require('http').createServer(expressApp);
 const { Server }  = require('socket.io');
 const io          = new Server(server);
 const open        = require('open');
@@ -13,6 +14,7 @@ const GameLog     = require('./GameLog');
 const GameStatus  = require('./GameStatus');
 const EdsmExpedition = require('./EdsmExpedition');
 const utils       = require('./utils');
+const WindowManager = require('./WindowManager');
 
 const customConfigPath = process.argv[2];
 
@@ -132,6 +134,9 @@ if (config.server.edsmExpeditionUrl) {
 /*
  * Socket
  */
+let windowManager;
+
+
 io.on('connection', (socket) => {
   let clientInfo;
 
@@ -162,7 +167,21 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log(new Date(), 'socket: user disconnected from ', clientInfo.origin, '(', clientInfo.platform, ')');
+    if (clientInfo) {
+      console.log(new Date(), 'socket: user disconnected from ', clientInfo.origin, '(', clientInfo.platform, ')');
+    } else {
+      console.log(new Date(), 'socket: user disconnected');
+    }
+  });
+
+  socket.on('lock', () => {
+    windowManager.windows.route.setIgnoreMouseEvents(true);
+    socket.broadcast.emit('lock');
+  });
+
+  socket.on('unlock', () => {
+    windowManager.windows.route.setIgnoreMouseEvents(false);
+    socket.broadcast.emit('unlock');
   });
 });
 
@@ -170,7 +189,10 @@ io.on('connection', (socket) => {
 /*
  * Server
  */
-app.use(express.static(paths.client));
+expressApp.use(express.static(paths.client));
+expressApp.get('/', function (req, res) {
+  res.sendFile(path.resolve(`${__dirname}/../client/controls/index.html`));
+})
 
 server.listen(3000, () => {
   console.log(new Date(), 'server: listening on *:3000');
@@ -179,10 +201,16 @@ server.listen(3000, () => {
   utils.getLocalIp().then(localIp => {
     console.log(  `    or to   http://${localIp}:3000   to open the widget from another device on the local network\n`)
 
-    if (config.server.openBrowser) {
-      open('http://localhost:3000');
-      console.log('    NOTE:   To disable the automatic opening of the browser, set the value\n' +
-                  '            `server.openBrowser` to `false` in the `config.yml` file\n');
+    if (!config.windows) {
+      config.windows = {};
     }
+    windowManager = new WindowManager(config.windows);
+    windowManager.createMain('http://localhost:3000')
+                 .then(windowManager.createWidget('http://localhost:3000/widgets/route'));
+
+    windowManager.onStateChange = state => {
+      config.windows = state;
+      fs.writeFileSync(paths.config, YAML.stringify(config));
+    };
   });
 });
