@@ -1,0 +1,6 @@
+
+.gui-autohide.gui-autohide--timeout .gui,
+.gui-autohide.in-game-menu-focus .gui,
+.gui-hidden .gui {
+  opacity: 0;
+}

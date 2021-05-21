@@ -6,6 +6,7 @@ const expressApp  = express();
 const server      = require('http').createServer(expressApp);
 const { Server }  = require('socket.io');
 const io          = new Server(server);
+const { app }     = require('electron');
 const open        = require('open');
 
 const Stats       = require('./Stats');
@@ -25,7 +26,11 @@ let edsmExpedition;
  */
 const paths = {
   configSample: `${__dirname}/../config.sample.yml`,
-  config:       customConfigPath ? customConfigPath : `${__dirname}/../../config.yml`,
+  config:       customConfigPath
+                ? customConfigPath
+                : app
+                ? `${app.getPath("userData")}/config.yml`
+                : `${__dirname}/../../config.yml`,
   stats:        `${__dirname}/../../stats.json`,
   client:       `${__dirname}/../client`,
 }
@@ -41,6 +46,9 @@ paths.eliteLogDir = config.server.eliteLogDir.replace('%userprofile%', homedir);
 paths.route       = paths.eliteLogDir + '/NavRoute.json';
 paths.status      = paths.eliteLogDir + '/Status.json';
 
+function saveConfig() {
+  fs.writeFileSync(paths.config, YAML.stringify(config));
+}
 
 /*
  * Stats
@@ -145,7 +153,7 @@ io.on('connection', (socket) => {
     console.log(new Date(), 'socket: user connected from ', clientInfo.origin, '(', clientInfo.platform, ')');
   });
 
-  socket.emit('config', config);
+  socket.emit('config', config.client);
   socket.emit('stats', stats.get());
   if (route.steps)            { socket.emit('route', route.steps); }
   if (gameLog.currentSystem)  { socket.emit('system', gameLog.currentSystem.name); }
@@ -159,11 +167,11 @@ io.on('connection', (socket) => {
     }
   }
 
-  socket.on('config', configFromClient => {
-    //console.log(new Date(), 'config: receive');
-    config = configFromClient;
-    socket.broadcast.emit('config', configFromClient);
-    fs.writeFileSync(paths.config, YAML.stringify(config));
+  socket.on('config', clientConfig => {
+    console.log(new Date(), 'config: receive');
+    socket.broadcast.emit('config', clientConfig);
+    config.client = clientConfig;
+    saveConfig();
   });
 
   socket.on('disconnect', () => {
@@ -175,11 +183,15 @@ io.on('connection', (socket) => {
   });
 
   socket.on('lock', () => {
+    config.client.locked = true;
+    saveConfig();
     windowManager.windows.route.setIgnoreMouseEvents(true);
     socket.broadcast.emit('lock');
   });
 
   socket.on('unlock', () => {
+    config.client.locked = false;
+    saveConfig();
     windowManager.windows.route.setIgnoreMouseEvents(false);
     socket.broadcast.emit('unlock');
   });
@@ -190,9 +202,6 @@ io.on('connection', (socket) => {
  * Server
  */
 expressApp.use(express.static(paths.client));
-expressApp.get('/', function (req, res) {
-  res.sendFile(path.resolve(`${__dirname}/../client/controls/index.html`));
-})
 
 server.listen(3000, () => {
   console.log(new Date(), 'server: listening on *:3000');
@@ -201,16 +210,20 @@ server.listen(3000, () => {
   utils.getLocalIp().then(localIp => {
     console.log(  `    or to   http://${localIp}:3000   to open the widget from another device on the local network\n`)
 
-    if (!config.windows) {
-      config.windows = {};
-    }
-    windowManager = new WindowManager(config.windows);
-    windowManager.createMain('http://localhost:3000')
-                 .then(windowManager.createWidget('http://localhost:3000/widgets/route'));
+    if (app) {
+      if (!config.windows) {
+        config.windows = {};
+      }
+      windowManager = new WindowManager(config.windows, config.client.locked);
+      windowManager.createMain('http://localhost:3000/controls')
+                   .then(windowManager.createWidget('http://localhost:3000/widgets/route'));
 
-    windowManager.onStateChange = state => {
-      config.windows = state;
-      fs.writeFileSync(paths.config, YAML.stringify(config));
-    };
+      windowManager.onStateChange = state => {
+        config.windows = state;
+        saveConfig();
+      };
+    } else {
+      open('http://localhost:3000/widgets/route');
+    }
   });
 });

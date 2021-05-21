@@ -1,14 +1,13 @@
 import { createElement }  from './modules/utils.js';
 import handles from './modules/handles.js';
 import Info    from './modules/Info.js';
-import Gui     from './modules/Gui.js';
 import Route   from './modules/Route.js';
+import Gui     from './modules/Gui.js';
 
 const socket  = io();
 const route   = new Route();
-const info    = new Info(createElement());
 const gui     = new Gui();
-let config;
+const info    = new Info(createElement());
 window.route  = route;
 window.gui    = gui;
 
@@ -16,14 +15,6 @@ window.addEventListener('resize', () => route.centerView() );
 
 [route.el, info.el].forEach(el => el.classList.add('gui'));
 
-/*
- * GUI
- */
-gui.onChange = clientConfig => {
-  //console.log('config: emit');
-  config.client = clientConfig;
-  socket.emit('config', config);
-};
 
 
 /*
@@ -53,10 +44,18 @@ socket.on('lock', () => {
   handles.lock();
 });
 
-socket.on('config', configFromServer => {
+socket.on('config', config => {
   //console.log('config: receive');
-  config = configFromServer;
-  gui.setState(config.client);
+  gui.setState(config);
+
+  if (typeof config.locked !== 'undefined') {
+    if (config.locked) {
+      handles.lock();
+    } else {
+      handles.unlock();
+    }
+  }
+
   route.centerView(550);
 });
 
@@ -80,7 +79,6 @@ socket.on('system', systemName => {
 socket.on('jumping', systemName => {
   //console.log('jumping:', systemName);
   route.jump(systemName);
-  document.documentElement.classList.remove('timeout');
   gui.clearAutohideTimeout();
 });
 

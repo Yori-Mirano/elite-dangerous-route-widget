@@ -1,0 +1,38 @@
+.config-panel {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0 32px;
+  display: flex;
+  flex-wrap: wrap-reverse;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1;
+  font-size: 10px;
+  max-width: 640px;
+  margin-bottom: -32px;
+  transition-property: transform, opacity;
+  transition-duration: .2s;
+}
+
+.config-panel > * {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  min-width: 38px;
+  margin-bottom: 20px;
+}
+
+.config-panel > * + * {
+  margin-left: 10px;
+}
+
+.config-panel > label > * {
+  margin-bottom: 8px;
+}
+
+.lock-control {
+  --color-theme: yellow;
+  border-right: 1px solid #444;
+  padding-right: 16px;
+}

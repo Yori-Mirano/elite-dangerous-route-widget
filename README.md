@@ -19,7 +19,6 @@ This widget is above all designed to be opened as a browser source in streaming 
 - **Customizable theme color**
 - Some customization options (shadow, alternative theme, GUI scale, compact view)
 - **Synchronization** of the customization options **between all clients** to control the appearance in OBS from another browser.
-- The **options GUI is only displayed when the view is more than 400px height** to prevent it from being displayed in OBS.
 
 ### Representation of the type of stars
 Five types of stars are represented:
@@ -55,7 +54,7 @@ There is only package for Windows at the moment. For Mac OS and Linux distribs, 
 #### Prerequisites
 Make sure you have installed all of the following prerequisites on your machine:
 
-- [node.js (v12)](https://nodejs.org/dist/latest-v12.x/) - Download & Install Node.js and the npm package manager.
+- [node.js (v14)](https://nodejs.org/dist/latest-v14.x/) - Download & Install Node.js and the npm package manager.
 
 #### Installation 
 In a terminal, at the root of the sources folder, type the following command:
@@ -67,7 +66,7 @@ npm install
 ## How to use
 ### Launch the app
 #### From source
-Unzip the package where you want, and execute the file `elite-dangerous-route-widget.bat`.
+Unzip the package where you want, and execute the file `elite-dangerous-route-widget.exe`.
 
 #### From source
 In a terminal, at the root of the sources folder, type the following command:
@@ -76,18 +75,28 @@ In a terminal, at the root of the sources folder, type the following command:
 npm start
 ```
 
-### Open the widget
-When launching the application, the widget automatically opens in a new tab in your default browser.
+### How to see the widget in-game
+To see the widget in-game, it must be borderless windowed (not the real fullscreen mode).
 
-NOTE: You can disable this automatic opening by setting the value of `server.openBrowser` to `false` in the` config.yml` file.
+### Controls
+The parameters related to the widget display are directly configurable via the main app window. 
 
-Otherwise, when the application is already launched, to manually open the widget, just open http://localhost:3000 in a browser or as source in OBS or equivalent **to access the route widget**.
+The settings are synchronized between each instance of the widget. You can thus control the appearance of the widget inserted in OBS via the browser of your PC or another device on the same local network.
 
-You can also access the widget from another device on the local network via the IP of the machine running the app.
+![Controls](docs/images/controls.png)
+
+### Move and resize
+To move or resize the widget, you have to unlock it with the yellow **Lock** button on the left.
+
+![Move and resize](docs/images/move-n-resize.png)
+
+When unlocked, the widget has a yellow border you can resize with, and a yellow top left corner for moving.
+
+When you're done, you need to lock so you can click through while you play.
 
 
 ### Add to your overlay in OBS (or equivalent)
-For the controls are not displayed, it is necessary that the height of view is less than **400px**.
+Click on the **Copy URL** button and paste it in a browser source in OBS (this URL also works in a standard browser on the host and other device via the IP of the host).
 
 ![Add a new browser source in OBS](docs/images/obs-settings.png)
 
@@ -100,23 +109,14 @@ transform: skewY(-6deg);
 ```
 ![Example of overlay in OBS](docs/images/overlay-obs-skew.jpg)
 
-
-### Configuration and controls
-#### Via the config file
-A configuration `config.yml` file is automatically generated when the program is run for the first time. You will have to relaunch it for your changes to take effect (to return to the default configuration, all you have to do is delete the file so that a new one is generated).
-
-#### Via the GUI
-Otherwise, most of the parameters related to the display are directly configurable via the widget. **To display them, it is enough that the view is greater than 400px height**.
-
-The settings are synchronized between each instance of the widget. You can thus control the appearance of the widget inserted in OBS via the browser of your PC or another device on the same local network.
-
-![Controls](docs/images/controls.png)
+### Configuration
+A configuration `config.yml` file is automatically generated into `%appdata%/elite-dangerous-route-widget/` when the program is run for the first time. You will have to relaunch it for your changes to take effect (to return to the default configuration, all you have to do is delete the file so that a new one is generated).
 
 
 ## FAQ
 
 ### I have an error at launch
-Check if the directory path of your E:D logs are correct in the `config.json` file, the `eliteLogDir` parameter. The default value is the Windows default directory of an E:D install.
+Check if the directory path of your E:D logs are correct in the `%appdata%/elite-dangerous-route-widget/config.yml` file, the `eliteLogDir` parameter. The default value is the Windows default directory of an E:D install.
 
 ### The route does not always update
 This is a known issue. In some cases, the game does not update the file that contains the route. Unfortunately, there is nothing I can do about it.

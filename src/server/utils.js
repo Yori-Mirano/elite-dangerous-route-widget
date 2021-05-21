@@ -1,7 +1,6 @@
 const http  = require ('http');
 const https = require ('https');
 const os    = require('os');
-const appConfig = require('electron-settings');
 const { execSync } = require('child_process');
 
 exports.getDistance = (positionA, positionB) => {

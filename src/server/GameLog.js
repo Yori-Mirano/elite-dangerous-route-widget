@@ -98,7 +98,7 @@ module.exports = class GameLog {
       }
 
       if (last) {
-        if (this._lastShipId !== this._currentShip.shipId) {
+        if (this._currentShip && this._currentShip.shipId && this._lastShipId !== this._currentShip.shipId) {
           //console.log(new Date(), 'ship: [ id:', this._currentShip.shipId, '| type:', this._currentShip.ship, '| name:', this._currentShip.shipName, '| ident:', this._currentShip.shipIdent, ']');
           this._lastShipId = this._currentShip.shipId;
 
@@ -108,7 +108,8 @@ module.exports = class GameLog {
         }
 
         if (this._isJumping) {
-          if (nextSystem && !this._lastJumpSystem || (this._lastJumpSystem && this._lastJumpSystem.name && nextSystem.name !== this._lastJumpSystem.name)) {
+          if ((nextSystem && nextSystem.name && !this._lastJumpSystem)
+          || (nextSystem && nextSystem.name && this._lastJumpSystem && nextSystem.name !== this._lastJumpSystem.name)) {
             //console.log(new Date(), 'jumping: ', nextSystem);
             this._lastJumpSystem = nextSystem;
 
@@ -117,7 +118,8 @@ module.exports = class GameLog {
             }
           }
 
-        } else if (this.currentSystem && !this._lastSystem || (this._lastSystem && this.currentSystem.name !== this._lastSystem.name)) {
+        } else if ((this.currentSystem && this.currentSystem.name && !this._lastSystem)
+        || (this.currentSystem && this.currentSystem.name && this._lastSystem && this.currentSystem.name !== this._lastSystem.name)) {
           //console.log(new Date(), 'system:', this.currentSystem);
           this._lastSystem = this.currentSystem;
 

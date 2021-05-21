@@ -1,0 +1,13 @@
+*, *::before, *::after { box-sizing: border-box; }
+
+:root, body { height: 100%; }
+
+body {
+  background-color: #111;
+  color: white;
+  font-family: Verdana, sans-serif;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

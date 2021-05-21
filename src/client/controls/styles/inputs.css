@@ -1,3 +1,8 @@
+input {
+  outline: 0;
+}
+
+
 /**
 * Input color
 */
@@ -52,12 +57,11 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: var(--color-on);
+  background: white;
   cursor: pointer;
   position: relative;
   top: 50%;
   transform: translateY(-50%);
-  box-shadow: 0 0 8px var(--color-background);
 }
 [type=range]::-moz-range-thumb {
   -webkit-appearance: none;
@@ -65,9 +69,8 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: var(--color-on);
+  background: white;
   cursor: pointer;
-  box-shadow: 0 0 8px var(--color-background);
 }
 
 [type=range]::-webkit-slider-runnable-track {
@@ -85,22 +88,68 @@
 
 
 /**
+* Button
 * Input checkbox
 */
+button,
 [type=checkbox] {
   -webkit-appearance: none;
   appearance: none;
   width: 24px;
   height: 24px;
   margin: 0;
+  border: none;
   border-radius: 3px;
-  padding: 4px;
   cursor: pointer;
-  background-clip: content-box;
-  box-shadow: 0 0 0 2px var(--color-theme), 0 0 8px var(--color-background);
+  box-shadow: 0 0 0 2px var(--color-theme), 0 0 8px #0008;
   transition: all .1s;
+}
+
+/**
+* Button
+*/
+button {
+  position: relative;
+  background-color: transparent;
+  padding: 0;
+  transition: background-color 1s;
+}
+
+button::after {
+  background-color: var(--color-theme);
+  transition: background-color 1s;
+}
+
+button:active {
+  background-color: var(--color-theme);
+  transition-duration: 0s;
+}
+
+button:active::after {
+  background-color: black;
+  transition-duration: 0s;
+}
+
+/**
+* Input checkbox
+*/
+[type=checkbox] {
+  background-clip: content-box;
+  padding: 4px;
 }
 
 [type=checkbox]:checked {
   background-color: var(--color-theme);
+}
+
+
+/**
+* Custom Buttons
+*/
+.copy-link::after {
+  content: "";
+  -webkit-mask-image: url('../assets/icons/link.svg');
+  display: block;
+  height: 100%;
+  transform: scale(.8);
 }

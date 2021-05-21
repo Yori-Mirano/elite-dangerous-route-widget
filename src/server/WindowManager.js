@@ -3,18 +3,20 @@ const { trackWindowState } = require('./utils');
 
 module.exports = class WindowManager {
   state = {};
+  locked;
   windows = {};
   onStateChange;
 
-  constructor(state) {
+  constructor(state, locked) {
     this.state = state;
+    this.locked = locked;
   }
 
   createMain(url) {
     return new Promise(resolve => {
       this.windows.main = new BrowserWindow({
-        width: 300,
-        height: 200,
+        width: 640,
+        height: 150,
         resizable: false,
         maximizable: false,
         show: false
@@ -23,12 +25,16 @@ module.exports = class WindowManager {
       this.windows.main.loadURL(url);
 
       this.windows.main.on('closed', () => {
+        if (process.platform !== 'darwin') {
         app.quit();
+        }
+
         process.exit();
       });
 
       this.windows.main.once('ready-to-show', () => {
-        this.windows.main.show()
+        this.windows.main.show();
+        // this.windows.main.openDevTools({mode:'undocked'});
         resolve();
       });
     });
@@ -60,6 +66,8 @@ module.exports = class WindowManager {
       maximizable: false,
       show: false
     });
+
+    this.windows.route.setIgnoreMouseEvents(this.locked);
 
     trackWindowState(this.windows.route, state => {
       this.state.route = state;
