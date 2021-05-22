@@ -1,0 +1,10 @@
+# CHANGELOG
+
+## v1.0.0-alpha.2
+- adds a true vertical layout
+- fixes some jump that sent a wrong target sytem
+
+## v1.0.0-alpha.1
+- adds Electron to be able to display the widget directly over the game window
+- moves the controls and the widget in separate windows
+- adds the first bricks to support EDSM expeditions
