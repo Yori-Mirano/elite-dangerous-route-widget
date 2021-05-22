@@ -70,7 +70,7 @@ socket.on('route', steps => {
   gui.resetAutohideTimeout();
 });
 
-socket.on('system', systemName => {
+socket.on('locate', systemName => {
   //console.log('system:', systemName);
   route.setCurrentSystem(systemName);
   gui.resetAutohideTimeout();

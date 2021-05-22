@@ -5,12 +5,12 @@ const StarSystem  = require('./StarSystem');
 
 module.exports = class GameLog {
   eliteLogDir;
+  isJumping = false;
   _dirWatcher;
   _currentShip;
   _lastShipId;
-  _lastJumpSystem;
+  lastJumpSystem;
   _lastSystem;
-  _isJumping;
   _lastLogFilePath;
   _prevLogFilePath;
   currentSystem;
@@ -76,7 +76,7 @@ module.exports = class GameLog {
 
         case 'StartJump':
           if (log.JumpType === "Hyperspace") {
-            this._isJumping = true;
+            this.isJumping = true;
             nextSystem = new StarSystem(log.StarSystem);
           }
           break;
@@ -84,7 +84,7 @@ module.exports = class GameLog {
         case 'Location':
         case 'FSDJump':
         case 'CarrierJump':
-          this._isJumping = false;
+          this.isJumping = false;
           this.currentSystem = new StarSystem(log.StarSystem, log.StarPos);
           break;
 
@@ -107,20 +107,22 @@ module.exports = class GameLog {
           }
         }
 
-        if (this._isJumping) {
-          if ((nextSystem && nextSystem.name && !this._lastJumpSystem)
-          || (nextSystem && nextSystem.name && this._lastJumpSystem && nextSystem.name !== this._lastJumpSystem.name)) {
-            //console.log(new Date(), 'jumping: ', nextSystem);
-            this._lastJumpSystem = nextSystem;
+        if (this.isJumping) {
+          if ((nextSystem && nextSystem.name)
+              && (!this.lastJumpSystem || (this.lastJumpSystem.name !== nextSystem.name))) {
+
+            console.log(new Date(), 'jumping: ', nextSystem);
+            this.lastJumpSystem = nextSystem;
 
             if (typeof this.onJump === 'function') {
               this.onJump(nextSystem);
             }
           }
 
-        } else if ((this.currentSystem && this.currentSystem.name && !this._lastSystem)
-        || (this.currentSystem && this.currentSystem.name && this._lastSystem && this.currentSystem.name !== this._lastSystem.name)) {
-          //console.log(new Date(), 'system:', this.currentSystem);
+        } else if ((this.currentSystem && this.currentSystem.name)
+            && (!this._lastSystem || (this._lastSystem.name !== this.currentSystem.name))) {
+
+          console.log(new Date(), 'system:', this.currentSystem);
           this._lastSystem = this.currentSystem;
 
           if (typeof this.onLocate === 'function') {

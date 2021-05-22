@@ -38,16 +38,18 @@ export default class {
   }
 
   setCurrentSystem(systemName) {
+    if (this.currentSystemName && this.systemList[this.currentSystemName]) {
+      this.systemList[this.currentSystemName].el.classList.remove('current')
+    }
+
     if (systemName && this.systemList[systemName]) {
       const system = this.systemList[systemName];
-
       system.el.classList.remove('jumping');
       system.el.classList.add('current');
       this.centerView();
       this.checkArrival();
+      this.currentSystemName = systemName;
     }
-
-    this.currentSystemName = systemName;
   }
 
   getRemainingJump() {
@@ -67,6 +69,7 @@ export default class {
   }
 
   jump(systemName) {
+    console.log({systemName})//TODO REMOVE ME
     if (this.currentSystemName && this.systemList[this.currentSystemName]) {
       this.systemList[this.currentSystemName].el.classList.remove('current')
     }

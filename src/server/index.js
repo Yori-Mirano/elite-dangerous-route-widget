@@ -156,8 +156,12 @@ io.on('connection', (socket) => {
   socket.emit('config', config.client);
   socket.emit('stats', stats.get());
   if (route.steps)            { socket.emit('route', route.steps); }
-  if (gameLog.currentSystem)  { socket.emit('system', gameLog.currentSystem.name); }
   if (gameStatus.status)      { socket.emit('status', gameStatus.status); }
+  if (gameLog.isJumping) {
+    if (gameLog.lastJumpSystem)  { socket.emit('jumping', gameLog.lastJumpSystem.name); }
+  } else {
+    if (gameLog.currentSystem)  { socket.emit('locate', gameLog.currentSystem.name); }
+  }
 
   if (edsmExpedition && edsmExpedition.waypoints) {
     socket.emit('expedition:waypoints', edsmExpedition.waypoints);
