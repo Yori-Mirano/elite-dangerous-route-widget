@@ -119,8 +119,8 @@ li:nth-child(odd) > span {
 }
 
 @keyframes pulse {
-  from { background-position: 0; }
-  to   { background-position: 100%; }
+  from { background-position: 0 0; }
+  to   { background-position: 100% 100%; }
 }
 
 li.jumping::before {
@@ -145,4 +145,62 @@ li.compact:not(.current):not(.jumping):not(:first-child):not(:last-child) > span
   --disabled-value: var(--color-off-alpha);
   --enabled-value: var(--compact) 0;
   opacity: var(--enabled-value, var(--disabled-value));
+}
+
+
+@media (orientation: portrait) {
+  .route-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    align-items: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 6rem, black calc(100% - 6rem), transparent);
+  }
+
+  ul {
+    flex-direction: column-reverse;
+    align-items: flex-end;
+    padding: 10rem 0;
+    padding-right: 4rem;
+    margin: auto 0 auto auto;
+    min-height: auto;
+    width: 100%;
+  }
+
+  li {
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+  }
+
+  li + li::before {
+    --max-width: 2rem;
+    width: .2rem;
+    height: var(--max-width);
+    margin: .2rem 0;
+  }
+
+  li.jumping::before {
+    animation: pulse infinite 1.5s linear reverse;
+    background-image: linear-gradient(to top, transparent, white, transparent);
+    background-size: 100% 25%;
+  }
+
+  li > span,
+  li:nth-child(odd) > span {
+    right: 2rem;
+    width: max-content;
+    font-size: 1.2rem;
+    text-align: right;
+    transform: none;
+  }
+
+  li.compact:not(.current):not(.jumping):not(:first-child) + li.compact:not(.current):not(.jumping):not(:last-child)::before {
+    --disabled-value: var(--max-width);
+    --enabled-value: var(--compact) 0;
+    width: .2rem;
+    height: var(--enabled-value, var(--disabled-value));
+  }
 }

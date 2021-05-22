@@ -47,15 +47,6 @@ socket.on('lock', () => {
 socket.on('config', config => {
   //console.log('config: receive');
   gui.setState(config);
-
-  if (typeof config.locked !== 'undefined') {
-    if (config.locked) {
-      handles.lock();
-    } else {
-      handles.unlock();
-    }
-  }
-
   route.centerView(550);
 });
 
@@ -71,13 +62,13 @@ socket.on('route', steps => {
 });
 
 socket.on('locate', systemName => {
-  //console.log('system:', systemName);
+  // console.log('system:', systemName);
   route.setCurrentSystem(systemName);
   gui.resetAutohideTimeout();
 });
 
 socket.on('jumping', systemName => {
-  //console.log('jumping:', systemName);
+  // console.log('jumping:', systemName);
   route.jump(systemName);
   gui.clearAutohideTimeout();
 });

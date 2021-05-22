@@ -1,5 +1,7 @@
 const { app, BrowserWindow, screen } = require('electron');
-const { trackWindowState } = require('./utils');
+const { trackWindowState }  = require('./utils');
+const { name, version }     = require(`${__dirname}/../../package.json`);
+const buildName             = `${name}-v${version}-win-x64`;
 
 module.exports = class WindowManager {
   state = {};
@@ -19,7 +21,8 @@ module.exports = class WindowManager {
         height: 150,
         resizable: false,
         maximizable: false,
-        show: false
+        show: false,
+        title: buildName,
       });
       this.windows.main.removeMenu();
       this.windows.main.loadURL(url);

@@ -111,7 +111,7 @@ module.exports = class GameLog {
           if ((nextSystem && nextSystem.name)
               && (!this.lastJumpSystem || (this.lastJumpSystem.name !== nextSystem.name))) {
 
-            console.log(new Date(), 'jumping: ', nextSystem);
+            //console.log(new Date(), 'jumping: ', nextSystem);
             this.lastJumpSystem = nextSystem;
 
             if (typeof this.onJump === 'function') {
@@ -122,7 +122,7 @@ module.exports = class GameLog {
         } else if ((this.currentSystem && this.currentSystem.name)
             && (!this._lastSystem || (this._lastSystem.name !== this.currentSystem.name))) {
 
-          console.log(new Date(), 'system:', this.currentSystem);
+          //console.log(new Date(), 'system:', this.currentSystem);
           this._lastSystem = this.currentSystem;
 
           if (typeof this.onLocate === 'function') {

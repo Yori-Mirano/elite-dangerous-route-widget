@@ -84,6 +84,7 @@ gameLog.onShipChange = ship => {
 }
 
 gameLog.onJump = nextSystem => {
+  // console.log('jumping:', nextSystem);
   const step = route.getStepByName(nextSystem.name);
   if (step) {
     stats.jump(step.StarPos);
@@ -94,13 +95,14 @@ gameLog.onJump = nextSystem => {
 }
 
 gameLog.onLocate = system => {
+  // console.log('locate:', system);
   const step = route.getStepByName(system.name);
   if (step) {
     stats.setPosition(step.StarPos);
     stats.setRemainingJump(route.getRemainingJump(system.name));
     stats.update();
   }
-  io.emit('system', system.name);
+  io.emit('locate', system.name);
 
   if (edsmExpedition && edsmExpedition.isFetched) {
     io.emit('expedition:progression', edsmExpedition.getProgression(system.position));
@@ -155,12 +157,15 @@ io.on('connection', (socket) => {
 
   socket.emit('config', config.client);
   socket.emit('stats', stats.get());
-  if (route.steps)            { socket.emit('route', route.steps); }
-  if (gameStatus.status)      { socket.emit('status', gameStatus.status); }
+
+  if (typeof config.client.locked !== 'undefined') { socket.emit(config.client.locked ? 'lock' : 'unlock'); }
+
+  if (route.steps)                { socket.emit('route', route.steps); }
+  if (gameStatus.status)          { socket.emit('status', gameStatus.status); }
   if (gameLog.isJumping) {
-    if (gameLog.lastJumpSystem)  { socket.emit('jumping', gameLog.lastJumpSystem.name); }
+    if (gameLog.lastJumpSystem)   { socket.emit('jumping', gameLog.lastJumpSystem.name); }
   } else {
-    if (gameLog.currentSystem)  { socket.emit('locate', gameLog.currentSystem.name); }
+    if (gameLog.currentSystem)    { socket.emit('locate', gameLog.currentSystem.name); }
   }
 
   if (edsmExpedition && edsmExpedition.waypoints) {

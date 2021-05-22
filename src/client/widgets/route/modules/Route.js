@@ -69,7 +69,6 @@ export default class {
   }
 
   jump(systemName) {
-    console.log({systemName})//TODO REMOVE ME
     if (this.currentSystemName && this.systemList[this.currentSystemName]) {
       this.systemList[this.currentSystemName].el.classList.remove('current')
     }
@@ -87,8 +86,11 @@ export default class {
     this.centerViewTimeout = setTimeout(() => {
       if (this.currentSystemName && this.systemList[this.currentSystemName]) {
         const currentSystemElementPosition = this.systemList[this.currentSystemName].getDomElementPosition();
-        const newScrollPosition = currentSystemElementPosition - (this.el.offsetWidth / 2);
-        this.el.scrollTo({left: newScrollPosition, behavior: "smooth"});
+        const newScrollPosition = {
+          left: currentSystemElementPosition.left - (this.el.offsetWidth / 2),
+          top:  currentSystemElementPosition.top - (this.el.offsetHeight / 2),
+        };
+        this.el.scrollTo({left: newScrollPosition.left, top: newScrollPosition.top, behavior: "smooth"});
       }
     }, delay);
   }

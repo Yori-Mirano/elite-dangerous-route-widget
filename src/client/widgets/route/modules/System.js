@@ -39,6 +39,9 @@ export default class {
   }
 
   getDomElementPosition() {
-    return this.el.offsetLeft + this.el.offsetWidth - (this.getPointSize() / 2);
+    return {
+      left: this.el.offsetLeft + this.el.offsetWidth - (this.getPointSize() / 2),
+      top:  this.el.offsetTop + this.el.offsetHeight - (this.getPointSize() / 2),
+    };
   }
 }
