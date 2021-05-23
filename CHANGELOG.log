@@ -1,4 +1,6 @@
 # CHANGELOG
+## v1.0.0-alpha.3
+- fix: makes sure that the widget no longer hides behind the game
 
 ## v1.0.0-alpha.2
 - adds a true vertical layout
