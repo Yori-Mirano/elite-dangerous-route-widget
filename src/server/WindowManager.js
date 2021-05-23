@@ -64,12 +64,12 @@ module.exports = class WindowManager {
       height: this.state.route.height,
       frame: false,
       transparent: true,
-      alwaysOnTop: true,
       minimizable: false,
       maximizable: false,
       show: false
     });
 
+    this.windows.route.setAlwaysOnTop(true, 'pop-up-menu');
     this.windows.route.setIgnoreMouseEvents(this.locked);
 
     trackWindowState(this.windows.route, state => {
