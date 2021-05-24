@@ -1,6 +1,6 @@
 {
   "name": "elite-dangerous-route-widget",
-  "version": "1.0.0-alpha.4",
+  "version": "1.0.0-alpha.5",
   "description": "A widget intended to be displayed on a stream via a browser source which shows the position on the current route.",
   "main": "./src/server/index.js",
   "engines": {
