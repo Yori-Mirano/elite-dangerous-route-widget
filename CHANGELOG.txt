@@ -1,6 +1,7 @@
 # CHANGELOG
 ## v1.0.0-alpha.4
 - feat: allows to reduce the controls window without reducing the widget
+- feat: retores the last control window position
 
 ## v1.0.0-alpha.3
 - fix: makes sure that the widget no longer hides behind the game
