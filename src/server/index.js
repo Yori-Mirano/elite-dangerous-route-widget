@@ -28,10 +28,8 @@ const paths = {
   configSample: `${__dirname}/../config.sample.yml`,
   config:       customConfigPath
                 ? customConfigPath
-                : app
-                ? `${app.getPath("userData")}/config.yml`
-                : `${__dirname}/../../config.yml`,
-  stats:        `${__dirname}/../../stats.json`,
+                : `${app.getPath("userData")}/config.yml`,
+  stats:        `${app.getPath("userData")}/stats.json`,
   client:       `${__dirname}/../client`,
 }
 

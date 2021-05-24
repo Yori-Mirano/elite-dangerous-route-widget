@@ -1,4 +1,7 @@
 # CHANGELOG
+## v1.0.0-alpha.5
+- fix: corrects the stats file path
+
 ## v1.0.0-alpha.4
 - feat: allows to reduce the controls window without reducing the widget
 - feat: restores the last control window position
