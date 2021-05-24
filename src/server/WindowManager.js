@@ -16,16 +16,33 @@ module.exports = class WindowManager {
 
   createMain(url) {
     return new Promise(resolve => {
+      const displays = screen.getAllDisplays();
+      const bounds = displays[0].bounds;
+
+      if (!this.state.controls) {
+        this.state.controls = {
+          x: bounds.width/2 - 640/2,
+          y: bounds.height/2 - 120/2,
+          width: 640,
+          height: 120
+        };
+      }
+
       this.windows.main = new BrowserWindow({
-        width: 640,
-        height: 150,
         resizable: false,
         maximizable: false,
         show: false,
         title: buildName,
       });
+
+      this.windows.main.setContentBounds(this.state.controls);
       this.windows.main.removeMenu();
       this.windows.main.loadURL(url);
+
+      trackWindowState(this.windows.main, state => {
+        this.state.controls = state;
+        this.notifyStateChange();
+      });
 
       this.windows.main.on('closed', () => {
         if (process.platform !== 'darwin') {
@@ -65,7 +82,7 @@ module.exports = class WindowManager {
       show: false
     });
 
-    this.windows.route.setBounds(this.state.route);
+    this.windows.route.setContentBounds(this.state.route);
     this.windows.route.setAlwaysOnTop(true, 'pop-up-menu');
     this.windows.route.setIgnoreMouseEvents(this.locked);
 

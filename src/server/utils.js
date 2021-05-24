@@ -58,7 +58,7 @@ exports.kill = (process) => {
 exports.trackWindowState = (windowRef, callback) => {
   ['resized', 'moved'].forEach(event => {
     windowRef.on(event, () => {
-      callback(windowRef.getBounds());
+      callback(windowRef.getContentBounds());
     });
   });
 }
