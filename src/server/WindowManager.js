@@ -57,11 +57,7 @@ module.exports = class WindowManager {
     }
 
     this.windows.route = new BrowserWindow({
-      parent: this.windows.main,
-      x: this.state.route.x,
-      y: this.state.route.y,
-      width: this.state.route.width,
-      height: this.state.route.height,
+      skipTaskbar: true,
       frame: false,
       transparent: true,
       minimizable: false,
@@ -69,6 +65,7 @@ module.exports = class WindowManager {
       show: false
     });
 
+    this.windows.route.setBounds(this.state.route);
     this.windows.route.setAlwaysOnTop(true, 'pop-up-menu');
     this.windows.route.setIgnoreMouseEvents(this.locked);
 
