@@ -1,4 +1,9 @@
 # CHANGELOG
+
+## v1.0.0-alpha.5.1
+- fix: corrects number of remaining jumps on route change
+- fix: supports special chars on waypoint name from EDSM expedition
+
 ## v1.0.0-alpha.5
 - fix: corrects the stats file path
 

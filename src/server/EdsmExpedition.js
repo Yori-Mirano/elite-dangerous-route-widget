@@ -51,7 +51,7 @@ module.exports = class EdsmExpedition {
       const cells   = row.querySelectorAll('td');
       const href    = cells[1].querySelector('a').getAttribute("href");
       const id      = href.match(/\/id\/(\d+)\//)[1];
-      const name    = href.match(/\/([^\/]+)$/)[1].replace(/\+/g, ' ');
+      const name    = unescape(href.match(/\/([^\/]+)$/)[1].replace(/\+/g, ' '));
 
       return {
         name,
