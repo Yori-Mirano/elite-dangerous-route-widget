@@ -62,12 +62,14 @@ const route   = new Route(paths.route);
 const gameLog = new GameLog(paths.eliteLogDir);
 
 route.onChange = steps => {
-  stats.setDestinationPosition(steps[steps.length-1].StarPos);
-  if (gameLog.currentSystem && gameLog.currentSystem.name) {
-    stats.setRemainingJump(route.getRemainingJump(gameLog.currentSystem.name));
+  if (steps.length > 0) {
+    stats.setDestinationPosition(steps[steps.length-1].StarPos);
+    if (gameLog.currentSystem && gameLog.currentSystem.name) {
+      stats.setRemainingJump(route.getRemainingJump(gameLog.currentSystem.name));
+    }
+    stats.update();
+    io.emit('route', steps);
   }
-  stats.update();
-  io.emit('route', steps);
 };
 
 route.watchFile();

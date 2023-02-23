@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## v1.0.0-alpha.5.2
+- fix: checks if there are actually waypoints in the NavRoutes file before processing them
+
 ## v1.0.0-alpha.5.1
 - fix: corrects number of remaining jumps on route change
 - fix: supports special chars on waypoint name from EDSM expedition
